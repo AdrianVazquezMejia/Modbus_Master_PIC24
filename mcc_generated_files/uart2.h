@@ -107,7 +107,14 @@ typedef union
 
 } INT_VAL;
 
-
+*state_table[]={SlaveAddress,Function,StartingAddress1HI, StartingAddress1LO, NoRegisters1Hi, NoRegisters1Lo, Crc1Hi, Crc1Lo,
+    StartingAddress2HI, StartingAddress2LO, NoRegisters2Hi, NoRegisters2Lo, Crc2Hi, Crc2Lo,        
+    StartingAddress3HI, StartingAddress3LO, NoRegisters3Hi, NoRegisters3Lo, Crc3Hi, Crc3Lo,        
+    StartingAddress4HI, StartingAddress4LO, NoRegisters4Hi, NoRegisters4Lo, Crc4Hi, Crc4Lo,
+    CoilAddress5HI, CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo,
+    RegisterAddress6HI, RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,
+            
+    EsperaSicronismo};
 void UART2_Initialize(void);
 
 /**************************************************************

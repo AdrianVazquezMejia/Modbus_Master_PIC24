@@ -139,7 +139,10 @@ void UART2_SetTxInterruptHandler(void* handler)
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2TXInterrupt ( void )
 {
-    (*UART2_TxDefaultInterruptHandler)();
+  pint++;
+    if(--contTx>0) U2TXREG = *pint; 
+    
+    IFS1bits.U2TXIF = false;
 }
 
 void UART2_Transmit_ISR ( void )
@@ -176,7 +179,47 @@ void UART2_SetRxInterruptHandler(void* handler)
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
 {
-    (*UART2_RxDefaultInterruptHandler)();
+
+    uint8_t auxRx;
+    
+    TMR2 = 0x00;
+    auxRx = U2RXREG;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 void UART2_Receive_ISR(void)
