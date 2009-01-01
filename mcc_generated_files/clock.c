@@ -58,7 +58,7 @@ void CLOCK_Initialize(void)
     PMD2 = 0x00;
     // PMPMD enabled; RTCCMD enabled; CMPMD enabled; CRCPMD enabled; I2C2MD enabled; 
     PMD3 = 0x00;
-    // NOSC FRCPLL; SOSCEN enabled; OSWEN Switch is Complete; 
+    // NOSC FRCPLL; SOSCEN disabled; OSWEN Switch is Complete; 
     __builtin_write_OSCCONH((uint8_t) (0x01));
-    __builtin_write_OSCCONL((uint8_t) (0x02));
+    __builtin_write_OSCCONL((uint8_t) (0x00));
 }

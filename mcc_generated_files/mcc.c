@@ -49,7 +49,7 @@
 #pragma config POSCMOD = NONE    //Primary Oscillator Select->Primary oscillator disabled
 #pragma config I2C1SEL = PRI    //I2C1 Pin Location Select->Use default SCL1/SDA1 pins
 #pragma config IOL1WAY = ON    //IOLOCK Protection->Once IOLOCK is set, cannot be changed
-#pragma config OSCIOFNC = OFF    //Primary Oscillator Output Function->OSC2/CLKO/RC15 functions as CLKO (FOSC/2)
+#pragma config OSCIOFNC = ON    //Primary Oscillator Output Function->OSC2/CLKO/RC15 functions as port I/O (RC15)
 #pragma config FCKSM = CSECME    //Clock Switching and Monitor->Clock switching is enabled, Fail-Safe Clock Monitor is enabled
 #pragma config FNOSC = FRCPLL    //Oscillator Select->Fast RC Oscillator with PLL module (FRCPLL)
 #pragma config SOSCSEL = SOSC    //Sec Oscillator Select->Default Secondary Oscillator (SOSC)
