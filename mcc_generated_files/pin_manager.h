@@ -50,7 +50,7 @@
     Section: Includes
 */
 #include <xc.h>
-
+#define LED PORTAbits.RA0
 /**
     Section: Device Pin Macros
 */

@@ -5,10 +5,10 @@
         <group>
             <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/tmr1.c</file>
             <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/interrupt_manager.c</file>
+            <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/main.c</file>
             <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/uart2.c</file>
             <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/uart1.c</file>
-            <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/clock.c</file>
-            <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/pin_manager.c</file>
+            <file>file:/C:/Users/rosa/Documents/MPlab/Modbus_Master_PIC.X/mcc_generated_files/uart2.h</file>
         </group>
     </open-files>
 </project-private>

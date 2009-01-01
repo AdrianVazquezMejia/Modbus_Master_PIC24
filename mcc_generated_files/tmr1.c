@@ -49,7 +49,11 @@
 
 #include <stdio.h>
 #include "tmr1.h"
+#include "uart2.h"
+#include "pin_manager.h"
 
+
+extern ModbusEstados curr_state; 
 /**
  Section: File specific functions
 */
@@ -106,7 +110,8 @@ void TMR1_Initialize (void)
     IEC0bits.T1IE = true;
 	
     tmr1_obj.timerElapsed = false;
-
+     /* Start the Timer */
+    T2CONbits.TON = 1;
 }
 
 
@@ -118,13 +123,14 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
 
     // ticker function call;
     // ticker is 1 -> Callback function gets called everytime this ISR executes
-    if(TMR1_InterruptHandler) 
-    { 
-           TMR1_InterruptHandler(); 
-    }
+   // if(TMR1_InterruptHandler) 
+    //{ 
+    //       TMR1_InterruptHandler(); 
+    //}
 
     //***User Area End
-
+    curr_state = SlaveAddress;
+    LED=!LED;
     tmr1_obj.count++;
     tmr1_obj.timerElapsed = true;
     IFS0bits.T1IF = false;
