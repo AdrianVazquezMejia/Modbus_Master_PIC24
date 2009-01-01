@@ -51,6 +51,69 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <xc.h>
+#include <stdlib.h>
+/*****************************************
+ *
+ *
+ *
+ */
+
+typedef enum
+{
+    /*  */
+    SlaveAddress,
+    Function,
+    StartingAddress1HI, StartingAddress1LO, NoRegisters1Hi, NoRegisters1Lo, Crc1Hi, Crc1Lo,
+    StartingAddress2HI, StartingAddress2LO, NoRegisters2Hi, NoRegisters2Lo, Crc2Hi, Crc2Lo,        
+    StartingAddress3HI, StartingAddress3LO, NoRegisters3Hi, NoRegisters3Lo, Crc3Hi, Crc3Lo,        
+    StartingAddress4HI, StartingAddress4LO, NoRegisters4Hi, NoRegisters4Lo, Crc4Hi, Crc4Lo,
+    CoilAddress5HI, CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo,
+    RegisterAddress6HI, RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,
+            
+    EsperaSicronismo
+
+}ModbusEstados;
+
+typedef struct
+{
+    uint16_t    b0:     1;
+    uint16_t    b1:     1;
+    uint16_t    b2:     1;
+    uint16_t    b3:     1;
+    uint16_t    b4:     1;
+    uint16_t    b5:     1;
+    uint16_t    b6:     1;
+    uint16_t    b7:     1;
+    uint16_t    b8:     1;
+    uint16_t    b9:     1;
+    uint16_t    b10:    1;
+    uint16_t    b11:    1;
+    uint16_t    b12:    1;
+    uint16_t    b13:    1;
+    uint16_t    b14:    1;
+    uint16_t    b15:    1;
+}WORD_BITS;
+
+typedef union
+{
+    uint16_t Val;
+    WORD_BITS   bits;
+    struct
+    {
+        uint8_t LB;
+        uint8_t HB;
+    } byte;
+
+} INT_VAL;
+
+
+void UART2_Initialize(void);
+
+/**************************************************************
+ * 
+ * 
+ * /
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 
