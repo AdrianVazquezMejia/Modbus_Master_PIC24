@@ -41,7 +41,7 @@
     MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
     TERMS.
 */
-/*The purpose of this UART is the cominication with the other using 
+/*The purpose of this UART is the comunication with the other using 
  * MODBUS. This one being the master
  
  */
@@ -53,7 +53,7 @@
 #include <stdint.h>
 #include "xc.h"
 #include "uart2.h"
-
+#define LED0 PORTAbits.RA0
 /**
   Section: Data Type Definitions
 */
@@ -63,13 +63,19 @@
   @Summary
     Defines the object required for the status of the queue.
 */
+INT_VAL dirIn;
+INT_VAL NoIn;
+INT_VAL Crc;
+INT_VAL CoilRegister;
 
 static uint8_t * volatile rxTail;
 static uint8_t *rxHead;
 static uint8_t *txTail;
 static uint8_t * volatile txHead;
 static bool volatile rxOverflowed;
-
+uint8_t *pint;
+uint8_t contTx;
+static uint8_t buffRx[100], buffTx[100],n,auxRx,SlaveID;
 /** UART Driver Queue Length
 
   @Summary
@@ -180,47 +186,148 @@ void UART2_SetRxInterruptHandler(void* handler)
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
 {
 
-    uint8_t auxRx;
-    
+   static uint8_t auxRx;
     TMR2 = 0x00;
     auxRx = U2RXREG;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    state_table[curr_state]();
+    }
+
+
+void SLAVEADDRESS(void)
+{
+    if(auxRx == SlaveID){
+                n=0;
+                buffRx[n++]  = auxRx;
+                curr_state = Function;
+            }
+    else curr_state =  EsperaSincronismo;
 }
+
+void FUNCTION(void)
+{
+    buffRx[n++]  = auxRx;
+    switch(auxRx)
+            {  
+                case 1:
+                   curr_state = StartingAddress1HI;
+                break;
+                
+                case 2:
+                    curr_state = StartingAddress2HI;
+                break;
+                         
+                case 3:
+                    curr_state = StartingAddress3HI;
+                break;
+                
+                case 4:
+                    curr_state = StartingAddress4HI;
+                break;
+                
+                case 5:
+                    curr_state = CoilAddress5HI;
+                break;
+                
+                case 6:
+                    curr_state = RegisterAddress6HI;
+                break;
+                         
+                case 15:
+                    curr_state =  EsperaSincronismo;
+                break;
+                
+                case 16:
+                    curr_state =  EsperaSincronismo;
+                break; 
+                
+                default:
+                    curr_state =  EsperaSincronismo;
+                break;    
+            
+            }
+}
+
+void STARTINGADDRESS1HI(void)
+{
+    buffRx[n++]  = auxRx;
+    dirIn.byte.HB = auxRx;
+    curr_state =  StartingAddress1LO;
+}
+
+void STARTINGADDRESS1LO(void)
+{
+    buffRx[n++]  = auxRx;
+    dirIn.byte.LB = auxRx;
+    curr_state=  NoRegisters1Hi;
+}
+
+void NOREGISTERS1Hi(void)
+{        
+    buffRx[n++]  = auxRx;
+    NoIn.byte.HB = auxRx;
+    curr_state =  NoRegisters1Lo;
+}
+
+void NOREGISTERS1Lo(void)
+{        
+    buffRx[n++]  = auxRx;
+    NoIn.byte.LB = auxRx;
+    curr_state =  Crc1Hi;
+}
+
+void CRC1Hi(void)
+{
+buffRx[n++] = auxRx;
+Crc.byte.HB = auxRx;
+curr_state=Crc1Lo;
+}
+
+void CRC1Lo(void)
+{
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state=  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0){
+		// datos buenos crear respuesta  
+		
+		LED0=!LED0; // LED0 cambia cada vez que pasa
+		
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=1;
+		buffTx[3]=CoilRegister.byte.LB;
+
+		Crc.Val=CRC16(buffTx,4);
+		buffTx[4]=Crc.byte.LB;
+		buffTx[5]=Crc.byte.HB;
+		
+		// transmite respuesta
+		contTx=6;
+		pint=buffTx;                
+		U2TXREG = *pint;
+
+}
+}   
+void STARTINGADDRESS2HI(void)
+{
+    buffRx[n++]  = auxRx;
+	dirIn.byte.HB = auxRx;
+	curr_state =  StartingAddress2LO;
+}
+
+void STARTINGADDRESS2LO(void)
+{
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+	curr_state =  NoRegisters2Hi;       
+}
+
+
+
+
+
+
 
 void UART2_Receive_ISR(void)
 {

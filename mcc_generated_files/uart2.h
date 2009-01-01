@@ -71,9 +71,11 @@ typedef enum
     CoilAddress5HI, CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo,
     RegisterAddress6HI, RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,
             
-    EsperaSicronismo
+    EsperaSincronismo
 
 }ModbusEstados;
+
+ModbusEstados curr_state=SlaveAddress;
 
 typedef struct
 {
@@ -167,7 +169,7 @@ void STARTINGADDRESS4LO(void);
     extern "C" {
 
 #endif
-/**
+/*
   Section: UART2 Driver Routines
 */
 
