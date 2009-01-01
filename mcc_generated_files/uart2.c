@@ -591,18 +591,72 @@ void CRC5Lo(void){
 	}           
 }
 
+void REGISTERADDRESS6HI(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.HB = auxRx;
+	curr_state = RegisterAddress6LO;
+}
 
+void REGISTERADDRESS6LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+	curr_state = WriteData6Hi;       
+}        
+void  WRITEDATA6Hi(void)
+{
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state = WriteData6Lo;
+}
 
+void WRITEDATA6Lo(void)
+{  
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc6Hi;
+}
 
+void CRC6Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state =  Crc6Lo;
+}
 
+void CRC6Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state =  EsperaSicronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0)
+	{
+		HoldingRegister[dirIn.Val].Val=NoIn.Val;
+		 
+		// datos buenos crear respuesta  
+		LED0=!LED0; // LED0 cambia cada vez que pasa
 
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=buffRx[2];
+		buffTx[3]=buffRx[3];
+		buffTx[4]=buffRx[4];
+		buffTx[5]=buffRx[5];
+		buffTx[6]=buffRx[6];
+		buffTx[7]=buffRx[7];
 
+		// transmite respuesta
+		contTx=8;
+		pint=buffTx;                
+		U2TXREG = *pint; 
+	}           
+}
 
-
-
-
-
-
+void EsperaSicronismo(void)
+{	// este estado no hace nada espera Timer 2 lo saque de aqui	
+}
 
 void UART2_Receive_ISR(void)
 {
