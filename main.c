@@ -47,14 +47,17 @@
 */
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/uart2.h"
-/*
+#include "mcc_generated_files/CRC.h"/*
+
                          Main application
  */
 extern INT_VAL InputRegister[10];
 extern INT_VAL HoldingRegister[10];
-
+extern uint8_t buffTx[100], contTx, *pint;
 extern INT_VAL CoilRegister;
-extern INT_VAL DiscreteInputRegister;
+extern INT_VAL DiscreteInputRegister,Crc;
+
+uint8_t t;
 int main(void)
 {
     // initialize the device
@@ -62,7 +65,22 @@ int main(void)
 
     while (1)
     {
-        // Add your application code
+        // Requesting a test information to a slave connected in UART2
+        buffTx[0]=01;
+        buffTx[1]=03;
+        buffTx[2]=00;
+        buffTx[3]=00;
+        buffTx[4]=00;
+        buffTx[5]=02;
+        Crc.Val=CRC16(buffTx,6);
+		buffTx[6]=Crc.byte.LB;
+		buffTx[7]=Crc.byte.HB;
+        
+        contTx=8;
+		pint=buffTx;                
+		U2TXREG = *pint;
+        
+        for(t=0;t<1000000;t++);  
     }
 
     return 1;

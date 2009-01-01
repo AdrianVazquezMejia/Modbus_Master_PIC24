@@ -51,8 +51,13 @@
  * 
  */
 
-#include "uart1.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "xc.h"
+#include "uart1.h"
+#include "CRC.h"
+#include "pin_manager.h"
 /**
   Section: Data Type Definitions
 */
