@@ -107,14 +107,15 @@ typedef union
 
 } INT_VAL;
 
-*state_table[]={SlaveAddress,Function,StartingAddress1HI, StartingAddress1LO, NoRegisters1Hi, NoRegisters1Lo, Crc1Hi, Crc1Lo,
-    StartingAddress2HI, StartingAddress2LO, NoRegisters2Hi, NoRegisters2Lo, Crc2Hi, Crc2Lo,        
-    StartingAddress3HI, StartingAddress3LO, NoRegisters3Hi, NoRegisters3Lo, Crc3Hi, Crc3Lo,        
-    StartingAddress4HI, StartingAddress4LO, NoRegisters4Hi, NoRegisters4Lo, Crc4Hi, Crc4Lo,
-    CoilAddress5HI, CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo,
-    RegisterAddress6HI, RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,
+*state_table[]={SLAVE_ADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
+    NOREGISTER1Hi, NOREGISTER1Lo, CRC1Hi, CRC1Lo,STARTINGADDRESS2HI,
+    STARTINGADDRESS2LO, NOREGISTER2Hi, NOREGISTER2Lo, CRC2Hi, CRC2Lo,        
+    STARTINGADDRESS3HI, STARTINGADDRESS3LO, NOREGISTER3Hi, NOREGISTER3Lo, Crc3Hi, Crc3Lo,        
+    STARTINGADDRESS4HI, STARTINGADDRESS4LO, NOREGISTER4Hi, NOREGISTER4Lo, Crc4Hi, Crc4Lo,
+    COILADDRESS5HI, COILADDRESS5LO, FORCEDATA5Hi, FORCEDATA5Lo, CRC5Hi, CRC5Lo,
+    REGISTERADDRESS6HI, REGISTERADDRESS6LO, WRITEDATA6Hi, WRITEDATA6Lo, CRCHi, CRC6Lo,
             
-    EsperaSicronismo};
+   ESPERASINCRONISMO};
 void UART2_Initialize(void);
 
 /**************************************************************
