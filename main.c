@@ -50,6 +50,11 @@
 /*
                          Main application
  */
+extern INT_VAL InputRegister[10];
+extern INT_VAL HoldingRegister[10];
+
+extern INT_VAL CoilRegister;
+extern INT_VAL DiscreteInputRegister;
 int main(void)
 {
     // initialize the device

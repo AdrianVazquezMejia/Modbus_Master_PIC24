@@ -66,8 +66,7 @@
 INT_VAL dirIn;
 INT_VAL NoIn;
 INT_VAL Crc;
-INT_VAL CoilRegister;
-INT_VAL DiscreteInputRegister;
+
 
 static uint8_t * volatile rxTail;
 static uint8_t *rxHead;
@@ -373,6 +372,153 @@ void CRC2Lo(void)
 
 	}
 }
+
+
+
+
+void STARTINGADDRESS3HI(void)
+{
+    buffRx[n++]  = auxRx;
+    dirIn.byte.HB = auxRx;
+    curr_state =  StartingAddress3LO;
+}
+
+void STARTINGADDRESS3LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+	curr_state = NoRegisters3Hi;
+}        
+
+void NOREGISTER3Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state =  NoRegisters3Lo;	
+}
+
+void NOREGISTER3Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc3Hi;	
+}
+
+void Crc3Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state =  Crc3Lo;
+}
+
+void Crc3Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+     curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0){
+		// datos buenos crear respuesta  
+		
+		LED0=!LED0; // LED0 cambia cada vez que pasa
+		
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=4;
+		buffTx[3]=HoldingRegister[0].byte.HB;
+		buffTx[4]=HoldingRegister[0].byte.LB;
+		buffTx[5]=HoldingRegister[1].byte.HB;
+		buffTx[6]=HoldingRegister[1].byte.LB;
+		Crc.Val=CRC16(buffTx,7);
+		buffTx[7]=Crc.byte.LB;
+		buffTx[8]=Crc.byte.HB;
+		
+		// transmite respuesta
+		contTx=9;
+		pint=buffTx;                
+		U2TXREG = *pint;
+
+	} 
+
+}
+
+void STARTINGADDRESS4HI(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.HB = auxRx;
+	curr_state =  StartingAddress4LO;
+	
+}
+
+void STARTINGADDRESS4LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+	curr_state =  NoRegisters4Hi;         
+}  
+
+void NOREGISTER4Hi(void)
+{        
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state =  NoRegisters4Lo;
+	
+}
+
+void NOREGISTER4Lo(void)
+{
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc4Hi;
+}
+
+void CRC4Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state=  Crc4Lo;
+	
+}
+
+void CRC4Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0){
+		// datos buenos crear respuesta  
+		
+		LED0=!LED0; // LED0 cambia cada vez que pasa
+		
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=4;
+		buffTx[3]=InputRegister[0].byte.HB;
+		buffTx[4]=InputRegister[0].byte.LB;
+		buffTx[5]=InputRegister[1].byte.HB;
+		buffTx[6]=InputRegister[1].byte.LB;
+		Crc.Val=CRC16(buffTx,7);
+		buffTx[7]=Crc.byte.LB;
+		buffTx[8]=Crc.byte.HB;
+		
+		// transmite respuesta
+		contTx=9;
+		pint=buffTx;                
+		U2TXREG = *pint;
+
+	}           
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
