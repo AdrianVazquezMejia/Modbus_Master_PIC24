@@ -67,6 +67,7 @@ INT_VAL dirIn;
 INT_VAL NoIn;
 INT_VAL Crc;
 INT_VAL CoilRegister;
+INT_VAL DiscreteInputRegister;
 
 static uint8_t * volatile rxTail;
 static uint8_t *rxHead;
@@ -323,8 +324,55 @@ void STARTINGADDRESS2LO(void)
 	curr_state =  NoRegisters2Hi;       
 }
 
+void  NOREGISTER2Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state =  NoRegisters2Lo;
+}
 
+void NOREGISTER2Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc2Hi;	
+}
 
+void CRC2Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state = Crc2Lo;	
+}
+
+void CRC2Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0){
+		// datos buenos crear respuesta  
+		
+		LED0=!LED0; // LED0 cambia cada vez que pasa
+		
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=1;
+		
+		buffTx[3]=DiscreteInputRegister.byte.LB;
+
+		Crc.Val=CRC16(buffTx,4);
+		buffTx[4]=Crc.byte.LB;
+		buffTx[5]=Crc.byte.HB;
+		
+		// transmite respuesta
+		contTx=6;
+		pint=buffTx;                
+		U2TXREG = *pint;
+
+	}
+}
 
 
 
