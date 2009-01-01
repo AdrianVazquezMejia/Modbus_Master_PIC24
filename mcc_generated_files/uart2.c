@@ -510,6 +510,87 @@ void CRC4Lo(void)
 	}           
 }
 
+void COILADDRESS5HI(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.HB = auxRx;
+	curr_state = CoilAddress5LO;
+}
+
+void COILADDRESS5LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+    curr_state = ForceData5Hi;       
+}
+void  FORCEDATA5Hi(void)
+{
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state = ForceData5Lo;
+}    
+
+void FORCEDATA5Lo(void){
+	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc5Hi;
+}
+
+void CRC5Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state =  Crc5Lo;	
+}
+
+void CRC5Lo(void){
+	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0)
+	{
+		switch(dirIn.Val)
+		{
+			case 0:
+				if(NoIn.Val==0xFF00) LATBbits.LATB0 = 1;
+				if(NoIn.Val==0x0000) LATBbits.LATB0 = 0;                        
+			break;
+			case 1:
+				if(NoIn.Val==0xFF00) LATBbits.LATB1 = 1;
+				if(NoIn.Val==0x0000) LATBbits.LATB1 = 0;                        
+			break;
+			case 2:
+				if(NoIn.Val==0xFF00) LATBbits.LATB2 = 1;
+				if(NoIn.Val==0x0000) LATBbits.LATB2 = 0;                        
+			break;
+			case 3:
+				if(NoIn.Val==0xFF00) LATBbits.LATB3 = 1;
+				if(NoIn.Val==0x0000) LATBbits.LATB3 = 0;                        
+			break;
+		}        
+
+		// datos buenos crear respuesta  
+		LED0=!LED0; // LED0 cambia cada vez que pasa
+
+		buffTx[0]=buffRx[0];
+		buffTx[1]=buffRx[1];
+		buffTx[2]=buffRx[2];
+		buffTx[3]=buffRx[3];
+		buffTx[4]=buffRx[4];
+		buffTx[5]=buffRx[5];
+		buffTx[6]=buffRx[6];
+		buffTx[7]=buffRx[7];
+
+		// transmite respuesta
+		contTx=8;
+		pint=buffTx;                
+		U2TXREG = *pint; 
+	}           
+}
+
 
 
 
