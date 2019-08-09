@@ -45,6 +45,11 @@
 /**
   Section: Included Files
 */
+/* Propose of this UART :
+ * 
+ * This UART is for the TPC/IP comunication, it is connected to se virtual serial port
+ * 
+ */
 
 #include "uart1.h"
 

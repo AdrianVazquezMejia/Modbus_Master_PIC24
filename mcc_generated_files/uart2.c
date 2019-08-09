@@ -41,6 +41,10 @@
     MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
     TERMS.
 */
+/*The purpose of this UART is the cominication with the other using 
+ * MODBUS. This one being the master
+ 
+ */
 
 /**
   Section: Included Files
