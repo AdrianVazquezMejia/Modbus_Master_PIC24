@@ -75,7 +75,7 @@ typedef enum
 
 }ModbusEstados;
 
-ModbusEstados curr_state=SlaveAddress;
+
 
 typedef struct
 {

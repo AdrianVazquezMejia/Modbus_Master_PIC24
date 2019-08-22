@@ -79,6 +79,7 @@ static uint8_t * volatile txHead;
 static bool volatile rxOverflowed;
 uint8_t *pint;
 uint8_t contTx;
+ModbusEstados curr_state=SlaveAddress;
 static uint8_t buffRx[100], buffTx[100],n,auxRx,SlaveID;
 /** UART Driver Queue Length
 
