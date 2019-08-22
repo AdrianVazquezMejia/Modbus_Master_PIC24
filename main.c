@@ -46,7 +46,7 @@
   Section: Included Files
 */
 #include "mcc_generated_files/system.h"
-
+#include "mcc_generated_files/uart2.h"
 /*
                          Main application
  */

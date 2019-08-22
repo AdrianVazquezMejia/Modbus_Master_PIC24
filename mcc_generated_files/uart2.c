@@ -53,6 +53,7 @@
 #include <stdint.h>
 #include "xc.h"
 #include "uart2.h"
+#include "CRC.h"
 #define LED0 PORTAbits.RA0
 /**
   Section: Data Type Definitions
@@ -189,7 +190,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
    static uint8_t auxRx;
     TMR2 = 0x00;
     auxRx = U2RXREG;
-    state_table[curr_state]();
+//    state_table[curr_state]();
     }
 
 
@@ -404,14 +405,14 @@ void NOREGISTER3Lo(void)
 	curr_state =  Crc3Hi;	
 }
 
-void Crc3Hi(void)
+void CRC3Hi(void)
 {	
 	buffRx[n++]  = auxRx;
 	Crc.byte.HB = auxRx;
 	curr_state =  Crc3Lo;
 }
 
-void Crc3Lo(void)
+void CRC3Lo(void)
 {	
 	buffRx[n++]  = auxRx;
 	Crc.byte.LB = auxRx;
@@ -629,7 +630,7 @@ void CRC6Lo(void)
 {	
 	buffRx[n++]  = auxRx;
 	Crc.byte.LB = auxRx;
-	curr_state =  EsperaSicronismo;
+	curr_state =  EsperaSincronismo;
 	//CRC
 	if(CRC16 (buffRx, n)==0)
 	{
