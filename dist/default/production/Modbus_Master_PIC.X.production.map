@@ -1,0 +1,63 @@
+Microchip Technology Inc, v1.36 (B)
+
+Tool Name:
+  c:\program files\microchip\xc16\v1.36\bin\bin\..\bin/elf-ld.exe
+
+Command:
+  -p24FJ64GA002 \
+  -o \
+  dist/default/production/Modbus_Master_PIC.X.production.elf \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/.. \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../lib \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/PIC24E/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/PIC24F/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/PIC24H/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/dsPIC30F/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/dsPIC33C/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/dsPIC33E/gld \
+  -Lc:/program files/microchip/xc16/v1.36/bin/bin/../../support/dsPIC33F/gld \
+  build/default/production/mcc_generated_files/tmr1.o \
+  build/default/production/mcc_generated_files/system.o \
+  build/default/production/mcc_generated_files/clock.o \
+  build/default/production/mcc_generated_files/traps.o \
+  build/default/production/mcc_generated_files/ext_int.o \
+  build/default/production/mcc_generated_files/interrupt_manager.o \
+  build/default/production/mcc_generated_files/mcc.o \
+  build/default/production/mcc_generated_files/uart1.o \
+  build/default/production/mcc_generated_files/pin_manager.o \
+  build/default/production/mcc_generated_files/uart2.o \
+  build/default/production/main.o \
+  build/default/production/mcc_generated_files/CRC.o \
+  --defsym=__MPLAB_BUILD=1 \
+  -Tp24FJ64GA002.gld.00 \
+  --stack=16 \
+  --check-sections \
+  --data-init \
+  --pack-data \
+  --handles \
+  --isr \
+  --no-gc-sections \
+  --fill-upper=0 \
+  --stackguard=16 \
+  --no-force-link \
+  --smart-io \
+  -Map=dist/default/production/Modbus_Master_PIC.X.production.map \
+  --report-mem \
+  --memorysummary \
+  dist/default/production/memoryfile.xml \
+  -start-group \
+  --library=lega-pic30-elf \
+  --library=m-elf \
+  --library=lega-c-elf \
+  -end-group \
+
+
+Optional library libpPIC24Fxxx.a not found
+Archive member included because of file (symbol)
+
+c:/program files/microchip/xc16/v1.36/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
+                              (__resetPRI)
+c:/program files/microchip/xc16/v1.36/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
+                              c:/program files/microchip/xc16/v1.36/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o) (__data_init_standard)
+c:/program files/microchip/xc16/v1.36/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
+                              (__crt_start_mode_normal)

@@ -67,7 +67,10 @@
 INT_VAL dirIn;
 INT_VAL NoIn;
 INT_VAL Crc;
-
+INT_VAL InputRegister[10];
+INT_VAL HoldingRegister[10];
+INT_VAL CoilRegister;
+INT_VAL DiscreteInputRegister;
 
 static uint8_t * volatile rxTail;
 static uint8_t *rxHead;
