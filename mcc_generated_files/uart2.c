@@ -72,6 +72,18 @@ INT_VAL HoldingRegister[10];
 INT_VAL CoilRegister;
 INT_VAL DiscreteInputRegister;
 
+void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
+    NOREGISTER1Hi, NOREGISTER1Lo, CRC1Hi, CRC1Lo,STARTINGADDRESS2HI,
+    STARTINGADDRESS2LO, NOREGISTER2Hi, NOREGISTER2Lo, CRC2Hi, CRC2Lo,        
+    STARTINGADDRESS3HI, STARTINGADDRESS3LO, NOREGISTER3Hi, NOREGISTER3Lo,
+    CRC3Hi, CRC3Lo, STARTINGADDRESS4HI, STARTINGADDRESS4LO, NOREGISTER4Hi,
+    NOREGISTER4Lo, CRC4Hi, CRC4Lo,COILADDRESS5HI, COILADDRESS5LO, FORCEDATA5Hi,
+    FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
+    WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};
+
+
+
+
 static uint8_t * volatile rxTail;
 static uint8_t *rxHead;
 static uint8_t *txTail;
@@ -194,7 +206,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
    static uint8_t auxRx;
     TMR2 = 0x00;
     auxRx = U2RXREG;
-//    state_table[curr_state]();
+    state_table[curr_state]();
     }
 
 
@@ -266,14 +278,14 @@ void STARTINGADDRESS1LO(void)
     curr_state=  NoRegisters1Hi;
 }
 
-void NOREGISTERS1Hi(void)
+void NOREGISTER1Hi(void)
 {        
     buffRx[n++]  = auxRx;
     NoIn.byte.HB = auxRx;
     curr_state =  NoRegisters1Lo;
 }
 
-void NOREGISTERS1Lo(void)
+void NOREGISTER1Lo(void)
 {        
     buffRx[n++]  = auxRx;
     NoIn.byte.LB = auxRx;
@@ -659,7 +671,7 @@ void CRC6Lo(void)
 	}           
 }
 
-void EsperaSicronismo(void)
+void ESPERASINCRONISMO(void)
 {	// este estado no hace nada espera Timer 2 lo saque de aqui	
 }
 
