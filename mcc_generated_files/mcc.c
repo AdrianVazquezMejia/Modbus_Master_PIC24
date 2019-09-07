@@ -54,7 +54,7 @@
 #pragma config FNOSC = FRCPLL    //Oscillator Select->Fast RC Oscillator with PLL module (FRCPLL)
 #pragma config SOSCSEL = SOSC    //Sec Oscillator Select->Default Secondary Oscillator (SOSC)
 #pragma config WUTSEL = LEG    //Wake-up timer Select->Legacy Wake-up Timer
-#pragma config IESO = ON    //Internal External Switch Over Mode->IESO mode (Two-Speed Start-up) enabled
+#pragma config IESO = OFF    //Internal External Switch Over Mode->IESO mode (Two-Speed Start-up) enabled
 
 // CONFIG1
 #pragma config WDTPS = PS8192    //Watchdog Timer Postscaler->1:8192

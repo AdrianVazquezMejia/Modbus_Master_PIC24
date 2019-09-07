@@ -130,7 +130,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
 
     //***User Area End
     curr_state = SlaveAddress;
-    LED=!LED;
+   // LED=!LED;
     tmr1_obj.count++;
     tmr1_obj.timerElapsed = true;
     IFS0bits.T1IF = false;

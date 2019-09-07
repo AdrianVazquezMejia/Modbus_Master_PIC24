@@ -73,7 +73,7 @@ INT_VAL HoldingRegister[10];
 INT_VAL CoilRegister;
 INT_VAL DiscreteInputRegister;
 
-void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
+/*void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
     NOREGISTER1Hi, NOREGISTER1Lo, CRC1Hi, CRC1Lo,STARTINGADDRESS2HI,
     STARTINGADDRESS2LO, NOREGISTER2Hi, NOREGISTER2Lo, CRC2Hi, CRC2Lo,        
     STARTINGADDRESS3HI, STARTINGADDRESS3LO, NOREGISTER3Hi, NOREGISTER3Lo,
@@ -82,7 +82,7 @@ void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTI
     FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
     WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};
 
-
+*/
 
 
 static uint8_t * volatile rxTail;
@@ -134,22 +134,25 @@ void UART2_Initialize(void)
     // BaudRate = 9600; Frequency = 16000000 Hz; BRG 416; 
     U2BRG = 0x1A0;
     
-    txHead = txQueue;
-    txTail = txQueue;
-    rxHead = rxQueue;
-    rxTail = rxQueue;
-   
-    rxOverflowed = 0;
-
-    UART2_SetTxInterruptHandler(UART2_Transmit_ISR);
-
-    UART2_SetRxInterruptHandler(UART2_Receive_ISR);
+//    txHead = txQueue;
+//    txTail = txQueue;
+//    rxHead = rxQueue;
+//    rxTail = rxQueue;
+//   
+//    rxOverflowed = 0;
+//
+//    UART2_SetTxInterruptHandler(UART2_Transmit_ISR);
+//
+//    UART2_SetRxInterruptHandler(UART2_Receive_ISR);
 
     IEC1bits.U2RXIE = 1;
     
     //Make sure to set LAT bit corresponding to TxPin as high before UART initialization
     U2MODEbits.UARTEN = 1;   // enabling UART ON bit
     U2STAbits.UTXEN = 1;
+    
+    IFS1bits.U2TXIF = false;	// Clear the Transmit Interrupt Flag 
+    IEC1bits.U2TXIE = 1;	// 1 Enable Transmit Interrupts
 }
 
 /**
@@ -163,6 +166,7 @@ void UART2_SetTxInterruptHandler(void* handler)
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2TXInterrupt ( void )
 {
+   PORTAbits.RA0=!PORTAbits.RA0;
   pint++;
     if(--contTx>0) U2TXREG = *pint; 
     
@@ -200,7 +204,7 @@ void UART2_SetRxInterruptHandler(void* handler)
 {
     UART2_RxDefaultInterruptHandler = handler;
 }
-
+/**
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
 {
 
@@ -675,7 +679,7 @@ void CRC6Lo(void)
 void ESPERASINCRONISMO(void)
 {	// este estado no hace nada espera Timer 2 lo saque de aqui	
 }
-
+*/
 void UART2_Receive_ISR(void)
 {
 

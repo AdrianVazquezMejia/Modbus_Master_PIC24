@@ -47,7 +47,9 @@
 */
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/uart2.h"
-#include "mcc_generated_files/CRC.h"/*
+#include "mcc_generated_files/CRC.h"
+#include "mcc_generated_files/pin_manager.h"
+/*
 
                          Main application
  */
@@ -57,7 +59,7 @@ extern uint8_t buffTx[100], contTx, *pint;
 extern INT_VAL CoilRegister;
 extern INT_VAL DiscreteInputRegister,Crc;
 
-uint8_t t;
+unsigned long t;
 int main(void)
 {
     // initialize the device
@@ -79,8 +81,10 @@ int main(void)
         contTx=8;
 		pint=buffTx;                
 		U2TXREG = *pint;
+		
         
         for(t=0;t<1000000;t++);  
+        LED1=!LED1;
     }
 
     return 1;

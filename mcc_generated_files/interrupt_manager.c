@@ -63,7 +63,7 @@ void INTERRUPT_Initialize (void)
         IPC7bits.U2RXIP = 1;
     //    TI: T1 - Timer1
     //    Priority: 1
-        IPC0bits.T1IP = 1;
+        //IPC0bits.T1IP = 1;
     //    UERI: U1E - UART1 Error
     //    Priority: 1
         IPC16bits.U1ERIP = 1;

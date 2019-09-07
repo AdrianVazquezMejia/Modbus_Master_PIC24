@@ -48,6 +48,14 @@
 
 void CLOCK_Initialize(void)
 {
+   //in case we had previously been already running from the PLL.
+    __builtin_write_OSCCONH((uint8_t) (OSCCONH & 0xF8));
+    if(OSCCONbits.COSC != OSCCONbits.NOSC)
+    {
+        __builtin_write_OSCCONL((uint8_t) (OSCCONL & 0xFF));            //Initiate clock switching operation.
+        while(OSCCONbits.OSWEN != 0);    //Wait for switching complete.
+        while (OSCCONbits.LOCK != 1);    //Wait till PLL is locked
+    }
     // RCDIV FRC/1; DOZE 1:8; DOZEN disabled; ROI disabled; 
     CLKDIV = 0x3000;
     // TUN Center frequency; 
@@ -60,5 +68,8 @@ void CLOCK_Initialize(void)
     PMD3 = 0x00;
     // NOSC FRCPLL; SOSCEN disabled; OSWEN Switch is Complete; 
     __builtin_write_OSCCONH((uint8_t) (0x01));
-    __builtin_write_OSCCONL((uint8_t) (0x00));
+    __builtin_write_OSCCONL((uint8_t) (0x01));
+    // Wait for Clock switch to occur
+//    while (OSCCONbits.OSWEN != 0);
+//    while (OSCCONbits.LOCK != 1);
 }
