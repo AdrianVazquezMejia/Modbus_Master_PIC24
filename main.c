@@ -58,33 +58,38 @@ extern INT_VAL HoldingRegister[10];
 extern uint8_t buffTx[100], contTx, *pint;
 extern INT_VAL CoilRegister;
 extern INT_VAL DiscreteInputRegister,Crc;
-
+uint16_t s=0;
 unsigned long t;
 int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
-
+    HoldingRegister[0].Val=5;
+    HoldingRegister[1].Val=10;
     while (1)
     {
         // Requesting a test information to a slave connected in UART2
-        buffTx[0]=01;
-        buffTx[1]=03;
-        buffTx[2]=00;
-        buffTx[3]=00;
-        buffTx[4]=00;
-        buffTx[5]=02;
-        Crc.Val=CRC16(buffTx,6);
-		buffTx[6]=Crc.byte.LB;
-		buffTx[7]=Crc.byte.HB;
-        
-        contTx=8;
-		pint=buffTx;                
-		U2TXREG = *pint;
-		
-        
+//        buffTx[0]=01;
+//        buffTx[1]=03;
+//        buffTx[2]=00;
+//        buffTx[3]=00;
+//        buffTx[4]=00;
+//        buffTx[5]=02;
+//        Crc.Val=CRC16(buffTx,6);
+//		buffTx[6]=Crc.byte.LB;
+//		buffTx[7]=Crc.byte.HB;
+//        
+//        contTx=8;
+//		pint=buffTx;                
+//		U2TXREG = *pint;
+		s++;
+        InputRegister[0].Val=s;
+        InputRegister[1].Val=s+1;
+        CoilRegister.bits.b0=1;
+        CoilRegister.bits.b2=1;
+        DiscreteInputRegister.byte.LB=0x0A;
         for(t=0;t<1000000;t++);  
-        LED1=!LED1;
+       //LED1=!LED1;
     }
 
     return 1;

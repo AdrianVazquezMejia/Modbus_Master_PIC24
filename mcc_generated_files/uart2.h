@@ -62,7 +62,7 @@
 typedef enum
 {
     /*  */
-    SlaveAddress,
+    SlaveAddress=0,
     Function,
     StartingAddress1HI, StartingAddress1LO, NoRegisters1Hi, NoRegisters1Lo, Crc1Hi, Crc1Lo,
     StartingAddress2HI, StartingAddress2LO, NoRegisters2Hi, NoRegisters2Lo, Crc2Hi, Crc2Lo,        
@@ -118,8 +118,8 @@ typedef union
     NOREGISTER4Lo, CRC4Hi, CRC4Lo,COILADDRESS5HI, COILADDRESS5LO, FORCEDATA5Hi,
     FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
     WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};*/
-/*void UART2_Initialize(void);
 
+void UART2_Initialize(void);
 void SLAVEADDRESS(void);
 void FUNCTION(void);
 void STARTINGADDRESS1HI(void);
@@ -160,7 +160,7 @@ void STARTINGADDRESS3HI(void);
 void STARTINGADDRESS3LO(void);
 void STARTINGADDRESS4HI(void);
 void STARTINGADDRESS4LO(void);
-*/
+
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 

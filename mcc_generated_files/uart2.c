@@ -56,6 +56,7 @@
 #include "CRC.h"
 #include "pin_manager.h"
 
+#define SlaveID 1
 /**
   Section: Data Type Definitions
 */
@@ -73,7 +74,7 @@ INT_VAL HoldingRegister[10];
 INT_VAL CoilRegister;
 INT_VAL DiscreteInputRegister;
 
-/*void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
+void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
     NOREGISTER1Hi, NOREGISTER1Lo, CRC1Hi, CRC1Lo,STARTINGADDRESS2HI,
     STARTINGADDRESS2LO, NOREGISTER2Hi, NOREGISTER2Lo, CRC2Hi, CRC2Lo,        
     STARTINGADDRESS3HI, STARTINGADDRESS3LO, NOREGISTER3Hi, NOREGISTER3Lo,
@@ -82,7 +83,7 @@ INT_VAL DiscreteInputRegister;
     FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
     WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};
 
-*/
+
 
 
 static uint8_t * volatile rxTail;
@@ -93,7 +94,7 @@ static bool volatile rxOverflowed;
 uint8_t *pint;
 uint8_t contTx;
 ModbusEstados curr_state=SlaveAddress;
-uint8_t buffRx[100], buffTx[100],n,auxRx,SlaveID;
+uint8_t buffRx[100], buffTx[100],n,auxRx;
 /** UART Driver Queue Length
 
   @Summary
@@ -204,14 +205,15 @@ void UART2_SetRxInterruptHandler(void* handler)
 {
     UART2_RxDefaultInterruptHandler = handler;
 }
-/**
+
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
 {
 
-   static uint8_t auxRx;
-    TMR2 = 0x00;
+    TMR1 = 0x00;
     auxRx = U2RXREG;
+    LED=1;
     state_table[curr_state]();
+    IFS1bits.U2RXIF = false;
     }
 
 
@@ -221,8 +223,13 @@ void SLAVEADDRESS(void)
                 n=0;
                 buffRx[n++]  = auxRx;
                 curr_state = Function;
+                LED=0;
+                //U2TXREG = auxRx; 
             }
-    else curr_state =  EsperaSincronismo;
+    else {
+        curr_state =  EsperaSincronismo;
+       // U2TXREG = auxRx;
+    }    
 }
 
 void FUNCTION(void)
@@ -677,9 +684,9 @@ void CRC6Lo(void)
 }
 
 void ESPERASINCRONISMO(void)
-{	// este estado no hace nada espera Timer 2 lo saque de aqui	
+{	// este estado no hace nada espera Timer 1 lo saque de aqui	
 }
-*/
+
 void UART2_Receive_ISR(void)
 {
 
