@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <executable name="dist/default/production/Modbus_Master_PIC.X.production.elf">
+  <executable name="dist/default/production/Modbus_Master_PIC24.production.elf">
     <memory name="data">
       <units>bytes</units>
       <length>8192</length>
-      <used>602</used>
-      <free>7590</free>
+      <used>588</used>
+      <free>7604</free>
     </memory>
     <memory name="program">
       <units>bytes</units>
       <length>65274</length>
-      <used>8562</used>
-      <free>56712</free>
+      <used>7416</used>
+      <free>57858</free>
     </memory>
   </executable>
 </project>
