@@ -49,12 +49,12 @@
 #pragma config POSCMOD = NONE    //Primary Oscillator Select->Primary oscillator disabled
 #pragma config I2C1SEL = PRI    //I2C1 Pin Location Select->Use default SCL1/SDA1 pins
 #pragma config IOL1WAY = ON    //IOLOCK Protection->Once IOLOCK is set, cannot be changed
-#pragma config OSCIOFNC = OFF    //Primary Oscillator Output Function->OSC2/CLKO/RC15 functions as CLKO (FOSC/2)
+#pragma config OSCIOFNC = ON    //Primary Oscillator Output Function->OSC2/CLKO/RC15 functions as port I/O (RC15)
 #pragma config FCKSM = CSECME    //Clock Switching and Monitor->Clock switching is enabled, Fail-Safe Clock Monitor is enabled
 #pragma config FNOSC = FRCPLL    //Oscillator Select->Fast RC Oscillator with PLL module (FRCPLL)
 #pragma config SOSCSEL = SOSC    //Sec Oscillator Select->Default Secondary Oscillator (SOSC)
 #pragma config WUTSEL = LEG    //Wake-up timer Select->Legacy Wake-up Timer
-#pragma config IESO = ON    //Internal External Switch Over Mode->IESO mode (Two-Speed Start-up) enabled
+#pragma config IESO = OFF    //Internal External Switch Over Mode->IESO mode (Two-Speed Start-up) enabled
 
 // CONFIG1
 #pragma config WDTPS = PS8192    //Watchdog Timer Postscaler->1:8192

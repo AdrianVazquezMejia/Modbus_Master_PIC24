@@ -96,10 +96,10 @@ void TMR1_Initialize (void)
 {
     //TMR1 0; 
     TMR1 = 0x00;
-    //Period = 0.000036875 s; Frequency = 16000000 Hz; PR1 589; 
-    PR1 = 0xE3D;
+    //Period = 0.003648 s; Frequency = 16000000 Hz; PR1 589; 
+    PR1 = 0xE3;
     //TCKPS 1:1; TON enabled; TSIDL disabled; TCS FOSC/2; TSYNC disabled; TGATE disabled; 
-    T1CON = 0x8020;
+    T1CON = 0x8030;
 
     if(TMR1_InterruptHandler == NULL)
     {
@@ -130,7 +130,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
 
     //***User Area End
     curr_state = SlaveAddress;
-    LED=!LED;
+   // LED=!LED;
     tmr1_obj.count++;
     tmr1_obj.timerElapsed = true;
     IFS0bits.T1IF = false;

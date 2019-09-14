@@ -47,26 +47,38 @@
 */
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/uart2.h"
+#include "mcc_generated_files/CRC.h"
+#include "mcc_generated_files/pin_manager.h"
 /*
+
                          Main application
  */
 extern INT_VAL InputRegister[10];
 extern INT_VAL HoldingRegister[10];
-
-extern INT_VAL CoilRegister;
-extern INT_VAL DiscreteInputRegister;
+extern uint8_t buffTx[100], contTx, *pint;
+//extern INT_VAL CoilRegister;
+//extern INT_VAL DiscreteInputRegister,Crc;
+uint16_t s=0;
+unsigned long t;
 int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
-
+    HoldingRegister[0].Val=5;
+    HoldingRegister[1].Val=10;
     while (1)
     {
-        // Add your application code
-        //hola adrian
-        
-        
-        
+        Com_MODBUS_Read(RTU1, ReadCoils, InValve, 1);
+        for(t=0;t<500000;t++);
+        Com_MODBUS_Write(RTU2,WriteCoil,OutValve,ON);
+		s++;
+//        InputRegister[0].Val=s;
+//        InputRegister[1].Val=s+1;
+//        CoilRegister.bits.b0=1;
+//        CoilRegister.bits.b2=1;
+//        DiscreteInputRegister.byte.LB=0x0A;
+        for(t=0;t<500000;t++);  
+       //LED1=!LED1;
     }
 
     return 1;

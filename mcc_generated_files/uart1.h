@@ -422,7 +422,6 @@ UART1_TRANSFER_STATUS UART1_TransferStatusGet (void );
 
 
 
-
 /**
   @Summary
     Returns the character in the read sequence at the offset provided, without

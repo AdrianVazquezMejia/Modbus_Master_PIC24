@@ -1,80 +1,47 @@
-/**
-  UART2 Generated Driver API Header File 
 
-  @Company
-    Microchip Technology Inc.
-
-  @File Name
-    uart2.h
-
-  @Summary
-    This is the generated header file for the UART2 driver using PIC24 / dsPIC33 / PIC32MM MCUs
-
-  @Description
-    This header file provides APIs for driver for UART2. 
-    Generation Information : 
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.125
-        Device            :  PIC24FJ64GA002
-    The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.36B
-        MPLAB             :  MPLAB X v5.20
-*/
-
-/*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
-
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
-
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
 
 #ifndef _UART2_H
 #define _UART2_H
+#define OverLevel 10001
+#define ON 0xFF00
+#define OFF 0x0000
 
-/**
- Section: Included Files
-*/
+
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <xc.h>
 #include <stdlib.h>
-/*****************************************
- *
- *
- *
- */
+
 
 typedef enum
 {
     /*  */
-    SlaveAddress,
-    Function,
-    StartingAddress1HI, StartingAddress1LO, NoRegisters1Hi, NoRegisters1Lo, Crc1Hi, Crc1Lo,
-    StartingAddress2HI, StartingAddress2LO, NoRegisters2Hi, NoRegisters2Lo, Crc2Hi, Crc2Lo,        
-    StartingAddress3HI, StartingAddress3LO, NoRegisters3Hi, NoRegisters3Lo, Crc3Hi, Crc3Lo,        
-    StartingAddress4HI, StartingAddress4LO, NoRegisters4Hi, NoRegisters4Lo, Crc4Hi, Crc4Lo,
-    CoilAddress5HI, CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo,
-    RegisterAddress6HI, RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,
-            
-    EsperaSincronismo
-
+    SlaveAddress=0, Function,ByteCount, Data, Crc1Hi, Crc1Lo, CoilAddress5HI, 
+    CoilAddress5LO, ForceData5Hi, ForceData5Lo, Crc5Hi, Crc5Lo, RegisterAddress6HI,
+    RegisterAddress6LO, WriteData6Hi, WriteData6Lo, Crc6Hi, Crc6Lo,EsperaSincronismo
 }ModbusEstados;
 
+typedef enum
+{
+    ReadCoils=1, ReadDiscreteInputs, ReadHoldingRegisters,ReadInputRegisters, 
+    WriteCoil, WriteRegister
+} ModbusFunctions;
+
+typedef enum
+{
+    InValve, BypassValve, OutValve, CleanValve, Fan, Pump
+} Coils;
+
+typedef enum
+{
+    InFluid = 30001, OutFluid, Level
+} InputRegisters;
+
+typedef enum
+{
+    RTU1=1, RTU2, RTU3, RTU4, RTU5, RTU6, RTU7, RTU8, RTU9
+} RTUS;
 
 
 typedef struct
@@ -109,29 +76,11 @@ typedef union
 
 } INT_VAL;
 
-
-/*void (*state_table[120])(void)={SLAVEADDRESS,FUNCTION,STARTINGADDRESS1HI, STARTINGADDRESS1LO,
-    NOREGISTER1Hi, NOREGISTER1Lo, CRC1Hi, CRC1Lo,STARTINGADDRESS2HI,
-    STARTINGADDRESS2LO, NOREGISTER2Hi, NOREGISTER2Lo, CRC2Hi, CRC2Lo,        
-    STARTINGADDRESS3HI, STARTINGADDRESS3LO, NOREGISTER3Hi, NOREGISTER3Lo,
-    CRC3Hi, CRC3Lo, STARTINGADDRESS4HI, STARTINGADDRESS4LO, NOREGISTER4Hi,
-    NOREGISTER4Lo, CRC4Hi, CRC4Lo,COILADDRESS5HI, COILADDRESS5LO, FORCEDATA5Hi,
-    FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
-    WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};*/
 void UART2_Initialize(void);
-
 void SLAVEADDRESS(void);
 void FUNCTION(void);
-void STARTINGADDRESS1HI(void);
-void STARTINGADDRESS1LO(void);
-void NOREGISTER1Hi(void);
-void NOREGISTER1Lo(void);
-void NOREGISTER2Hi(void);
-void NOREGISTER2Lo(void);
-void NOREGISTER3Hi(void);
-void NOREGISTER3Lo(void);
-void NOREGISTER4Hi(void);
-void NOREGISTER4Lo(void);
+void BYTECOUNT(void);
+void DATA(void);
 void REGISTERADDRESS6HI(void);
 void REGISTERADDRESS6LO(void);
 void WRITEDATA6Hi(void);
@@ -144,23 +93,16 @@ void FORCEDATA5Hi(void);
 void NOREGISTER1Lo(void);
 void CRC1Hi(void);
 void CRC1Lo(void);
-void CRC2Hi(void);
-void CRC2Lo(void);
-void CRC3Hi(void);
-void CRC3Lo(void);
-void CRC4Hi(void);
-void CRC4Lo(void);
 void CRC5Hi(void);
 void CRC5Lo(void);
 void CRC6Hi(void);
 void CRC6Lo(void);
-void STARTINGADDRESS2HI(void);
-void STARTINGADDRESS2LO(void);
-void STARTINGADDRESS3HI(void);
-void STARTINGADDRESS3LO(void);
-void STARTINGADDRESS4HI(void);
-void STARTINGADDRESS4LO(void);
 
+
+
+void Com_MODBUS_Init(void);
+void Com_MODBUS_Read(uint8_t Slave, uint8_t Function, uint16_t StartingAddress, uint16_t Quantity);
+void Com_MODBUS_Write(uint8_t Slave, uint8_t Function, uint16_t Address, uint16_t Data);
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 
