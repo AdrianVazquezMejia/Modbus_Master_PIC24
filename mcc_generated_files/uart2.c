@@ -37,12 +37,7 @@ uint8_t *pint;
 uint8_t contTx;
 ModbusEstados curr_state=SlaveAddress;
 uint8_t buffRx[100], buffTx[100],n,auxRx;
-/** UART Driver Queue Length
 
-  @Summary
-    Defines the length of the Transmit and Receive Buffers
-
-*/
 
 #define UART2_CONFIG_TX_BYTEQ_LENGTH (8+1)
 #define UART2_CONFIG_RX_BYTEQ_LENGTH (8+1)
