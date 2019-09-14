@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Modbus_Master_PIC24
+PROJECTNAME=Modbus_Master_PIC.X
 
 # Active Configuration
 DEFAULTCONF=default
