@@ -54,7 +54,8 @@
 #include "xc.h"
 #include "uart2.h"
 #include "CRC.h"
-#define LED0 PORTAbits.RA0
+#include "pin_manager.h"
+
 /**
   Section: Data Type Definitions
 */
@@ -92,7 +93,7 @@ static bool volatile rxOverflowed;
 uint8_t *pint;
 uint8_t contTx;
 ModbusEstados curr_state=SlaveAddress;
-static uint8_t buffRx[100], buffTx[100],n,auxRx,SlaveID;
+uint8_t buffRx[100], buffTx[100],n,auxRx,SlaveID;
 /** UART Driver Queue Length
 
   @Summary
@@ -308,7 +309,7 @@ void CRC1Lo(void)
 	if(CRC16 (buffRx, n)==0){
 		// datos buenos crear respuesta  
 		
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED = !LED; // LED0 cambia cada vez que pasa
 		
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
@@ -370,7 +371,7 @@ void CRC2Lo(void)
 	if(CRC16 (buffRx, n)==0){
 		// datos buenos crear respuesta  
 		
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED=!LED; // LED0 cambia cada vez que pasa
 		
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
@@ -437,7 +438,7 @@ void CRC3Lo(void)
 	if(CRC16 (buffRx, n)==0){
 		// datos buenos crear respuesta  
 		
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED=!LED; // LED0 cambia cada vez que pasa
 		
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
@@ -506,7 +507,7 @@ void CRC4Lo(void)
 	if(CRC16 (buffRx, n)==0){
 		// datos buenos crear respuesta  
 		
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED = !LED; // LED0 cambia cada vez que pasa
 		
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
@@ -590,7 +591,7 @@ void CRC5Lo(void){
 		}        
 
 		// datos buenos crear respuesta  
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED = !LED; // LED0 cambia cada vez que pasa
 
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
@@ -653,7 +654,7 @@ void CRC6Lo(void)
 		HoldingRegister[dirIn.Val].Val=NoIn.Val;
 		 
 		// datos buenos crear respuesta  
-		LED0=!LED0; // LED0 cambia cada vez que pasa
+		LED = !LED; // LED0 cambia cada vez que pasa
 
 		buffTx[0]=buffRx[0];
 		buffTx[1]=buffRx[1];
