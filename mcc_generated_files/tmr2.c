@@ -90,12 +90,18 @@
   Section: Driver Interface
 */
 
+// variables
+
+int cont = 0; 
+a[] = "hola como estas";
+
+
 void TMR2_Initialize (void)
 {
     //TMR2 0; 
     TMR2 = 0x00;
-    //Period = 0.000000125 s; Frequency = 16000000 Hz; PR2 1; 
-    PR2 = 0x01;
+    //Period = 0s; Frequency = 16000000 Hz; PR2 1; 
+    PR2 = 0x3E80; // = 16000 produce una interrupcion cada 1 mseg
     //TCKPS 1:1; T32 16 Bit; TON enabled; TSIDL disabled; TCS FOSC/2; TGATE disabled; 
     T2CON = 0x8000;
 
@@ -116,22 +122,13 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
 {
     /* Check if the Timer Interrupt/Status is set */
 
-    //***User Area Begin
-
-    // ticker function call;
-    // ticker is 1 -> Callback function gets called everytime this ISR executes
-//    if(TMR2_InterruptHandler) 
-//    { 
-//           TMR2_InterruptHandler(); 
-//    }
-
-    //***User Area End
-
-//    tmr2_obj.count++;
-//    tmr2_obj.timerElapsed = true;
+    cont++;
     
-    char a = 'a'; 
-    U1TXREG = a;
+    if(cont == 1000){
+        U1TXREG = 'comer hoy';
+        cont = 0;
+    }
+    
     IFS0bits.T2IF = false;
 }
 

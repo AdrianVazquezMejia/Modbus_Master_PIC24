@@ -59,9 +59,9 @@ void SYSTEM_Initialize(void)
     INTERRUPT_Initialize();
     CLOCK_Initialize();
     UART1_Initialize();
-   // UART2_Initialize();
+    UART2_Initialize();
     TMR2_Initialize();
-  //  TMR1_Initialize();
+    TMR1_Initialize();
     EXT_INT_Initialize();
 }
 

@@ -63,18 +63,6 @@
     Defines the object required for the status of the queue.
 */
 
-//typedef union
-//{
-//    struct
-//    {
-//            uint8_t full:1;
-//            uint8_t empty:1;
-//            uint8_t reserved:6;
-//    }s;
-//    uint8_t status;
-//}
-//
-//UART_BYTEQ_STATUS;
 
 /** UART Driver Hardware Instance Object
 
@@ -82,30 +70,6 @@
     Defines the object required for the maintenance of the hardware instance.
 
 */
-//typedef struct
-//{
-//    /* RX Byte Q */
-//    uint8_t                                      *rxTail ;
-//
-//    uint8_t                                      *rxHead ;
-//
-//    /* TX Byte Q */
-//    uint8_t                                      *txTail ;
-//
-//    uint8_t                                      *txHead ;
-//
-//    UART_BYTEQ_STATUS                        rxStatus ;
-//
-//    UART_BYTEQ_STATUS                        txStatus ;
-//
-//} UART_OBJECT ;
-//
-//static UART_OBJECT uart1_obj ;
-
-
-
-
-
 
 /** UART Driver Queue Length
 
@@ -135,7 +99,6 @@ static uint8_t uart1_rxByteQ[UART1_CONFIG_RX_BYTEQ_LENGTH];
   Section: Driver Interface
 */
 
-
 void UART1_Initialize (void)
 {
    // STSEL 1; IREN disabled; PDSEL 8N; UARTEN enabled; RTSMD disabled; USIDL disabled; WAKE disabled; ABAUD disabled; LPBACK disabled; BRGH enabled; RXINV disabled; UEN TX_RX; 
@@ -153,17 +116,7 @@ void UART1_Initialize (void)
    U1MODEbits.UARTEN = 1;  // enabling UART ON bit
    U1STAbits.UTXEN = 1;
    
-   
-
-//   uart1_obj.txHead = uart1_txByteQ;
-//   uart1_obj.txTail = uart1_txByteQ;
-//   uart1_obj.rxHead = uart1_rxByteQ;
-//   uart1_obj.rxTail = uart1_rxByteQ;
-//   uart1_obj.rxStatus.s.empty = true;
-//   uart1_obj.txStatus.s.empty = true;
-//   uart1_obj.txStatus.s.full = false;
-//   uart1_obj.rxStatus.s.full = false;
- 
+  
 }
 
 /**
@@ -176,13 +129,9 @@ void UART1_Initialize (void)
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
 {   
 //    (*UART1_TxDefaultInterruptHandler)();
-    
-        // prueba
-    
-        
-    IFS0bits.U1TXIF = false; // apago la bandera de interrupcion
-       
-              
+           
+    IFS0bits.U1TXIF = 0; // apago la bandera de interrupcion
+                 
         
 }
 //
@@ -231,6 +180,9 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1RXInterrupt( void )
 {
 //    (*UART1_RxDefaultInterruptHandler)();
+    
+    IFS0bits.U1RXIF = 0;
+   
 }
 //
 //void UART1_Receive_ISR(void)
@@ -283,6 +235,8 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1ErrInterrupt ( void )
 /**
   Section: UART Driver Client Routines
 */
+
+
 //
 //uint8_t UART1_Read( void)
 //{
