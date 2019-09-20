@@ -207,7 +207,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U2RXInterrupt( void )
     TMR2 = 0x00;
     auxRx = U2RXREG;
     state_table[curr_state]();
-    }
+}
 
 
 void SLAVEADDRESS(void)

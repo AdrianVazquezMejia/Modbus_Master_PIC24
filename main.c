@@ -47,6 +47,7 @@
 */
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/uart2.h"
+#include "mcc_generated_files/uart1.h"
 /*
                          Main application
  */
@@ -63,7 +64,7 @@ int main(void)
     while (1)
     {
         // Add your application code
-        //hola adrian
+       
         
         
         

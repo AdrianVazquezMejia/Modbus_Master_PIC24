@@ -53,15 +53,13 @@
 
 #include "uart1.h"
 
+
 /**
   Section: Data Type Definitions
 */
 
-/** UART Driver Queue Status
 
-  @Summary
-    Defines the object required for the status of the queue.
-*/
+
 
 
 /** UART Driver Hardware Instance Object
@@ -71,33 +69,22 @@
 
 */
 
-/** UART Driver Queue Length
-
-  @Summary
-    Defines the length of the Transmit and Receive Buffers
-
-*/
-
-#define UART1_CONFIG_TX_BYTEQ_LENGTH 8
-#define UART1_CONFIG_RX_BYTEQ_LENGTH 8
 
 
-/** UART Driver Queue
 
-  @Summary
-    Defines the Transmit and Receive Buffers
 
-*/
 
-static uint8_t uart1_txByteQ[UART1_CONFIG_TX_BYTEQ_LENGTH];
-static uint8_t uart1_rxByteQ[UART1_CONFIG_RX_BYTEQ_LENGTH];
 
-//void (*UART1_TxDefaultInterruptHandler)(void);
-//void (*UART1_RxDefaultInterruptHandler)(void);
+
+
+
 
 /**
   Section: Driver Interface
 */
+
+
+
 
 void UART1_Initialize (void)
 {
@@ -106,7 +93,7 @@ void UART1_Initialize (void)
    // UTXISEL0 TX_ONE_CHAR; UTXINV disabled; OERR NO_ERROR_cleared; URXISEL RX_ONE_CHAR; UTXBRK COMPLETED; UTXEN disabled; ADDEN disabled; 
    U1STA = 0x0000;
    // BaudRate = 9600; Frequency = 16000000 Hz; BRG 416; 
-   U1BRG = 0x01A0;
+   U1BRG = 0x1A0;
     
    IEC0bits.U1RXIE = 1;
 //   UART1_SetRxInterruptHandler(UART1_Receive_ISR);
@@ -132,7 +119,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
            
     IFS0bits.U1TXIF = 0; // apago la bandera de interrupcion
                  
-        
+    
 }
 //
 //void UART1_Transmit_ISR(void)
@@ -182,7 +169,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1RXInterrupt( void )
 //    (*UART1_RxDefaultInterruptHandler)();
     
     IFS0bits.U1RXIF = 0;
-   
+    
 }
 //
 //void UART1_Receive_ISR(void)
@@ -232,9 +219,11 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1ErrInterrupt ( void )
     IFS4bits.U1ERIF = false;
 }
 
+
 /**
   Section: UART Driver Client Routines
 */
+
 
 
 //
@@ -429,6 +418,3 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1ErrInterrupt ( void )
 //}
 
 
-/**
-  End of File
-*/

@@ -51,6 +51,8 @@
 #include "tmr2.h"
 #include "pin_manager.h"
 #include "uart1.h"
+#include "uart2.h"
+
 
 /**
  Section: File specific functions
@@ -92,8 +94,8 @@
 
 // variables
 
-int cont = 0; 
-a[] = "hola como estas";
+
+
 
 
 void TMR2_Initialize (void)
@@ -117,20 +119,31 @@ void TMR2_Initialize (void)
 
 }
 
+char a[] = "alexis ";
+int cont = 1;
+int n = 0;
+
+
+
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
 {
     /* Check if the Timer Interrupt/Status is set */
-
     cont++;
     
-    if(cont == 1000){
-        U1TXREG = 'comer hoy';
-        cont = 0;
+    if(cont == 200){
+       cont = 1;
+       U1TXREG = a[n]; 
+       n++;
+       if (n == 7){n = 0;}
+        
+
     }
-    
     IFS0bits.T2IF = false;
 }
+
+
+
 
 //void TMR2_Period16BitSet( uint16_t value )
 //{
