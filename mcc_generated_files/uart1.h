@@ -53,6 +53,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+
+
 #ifdef __cplusplus  // Provide C++ Compatibility
 
     extern "C" {
@@ -657,3 +660,25 @@ bool UART1_is_tx_done(void);
   End of File
 */
 
+    // estructuras
+    
+typedef enum
+{
+    ReadCoils=1, ReadDiscreteInputs, ReadHoldingRegisters,ReadInputRegisters, 
+    WriteCoil, WriteRegister
+} ModbusFunctions;
+
+typedef enum
+{
+    InValve, BypassValve, OutValve, CleanValve, Fan, Pump
+} Coils;
+
+typedef enum
+{
+    InFluid = 30001, OutFluid, Level
+} InputRegisters;
+
+typedef enum
+{
+    RTU1=1, RTU2, RTU3, RTU4, RTU5, RTU6, RTU7, RTU8, RTU9
+} RTUS;
