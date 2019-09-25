@@ -68,16 +68,7 @@
     Defines the object required for the status of the queue.
 */
 
-typedef union
-{
-    struct
-    {
-            uint8_t full:1;
-            uint8_t empty:1;
-            uint8_t reserved:6;
-    }s;
-    uint8_t status;
-}
+
 
 UART_BYTEQ_STATUS;
 
@@ -87,25 +78,7 @@ UART_BYTEQ_STATUS;
     Defines the object required for the maintenance of the hardware instance.
 
 */
-typedef struct
-{
-    /* RX Byte Q */
-    uint8_t                                      *rxTail ;
 
-    uint8_t                                      *rxHead ;
-
-    /* TX Byte Q */
-    uint8_t                                      *txTail ;
-
-    uint8_t                                      *txHead ;
-
-    UART_BYTEQ_STATUS                        rxStatus ;
-
-    UART_BYTEQ_STATUS                        txStatus ;
-
-} UART_OBJECT ;
-
-static UART_OBJECT uart1_obj ;
 
 /** UART Driver Queue Length
 
@@ -128,8 +101,7 @@ static UART_OBJECT uart1_obj ;
 static uint8_t uart1_txByteQ[UART1_CONFIG_TX_BYTEQ_LENGTH] ;
 static uint8_t uart1_rxByteQ[UART1_CONFIG_RX_BYTEQ_LENGTH] ;
 
-void (*UART1_TxDefaultInterruptHandler)(void);
-void (*UART1_RxDefaultInterruptHandler)(void);
+
 
 /**
   Section: Driver Interface
@@ -155,14 +127,278 @@ void UART1_Initialize (void)
    
    
 
-   uart1_obj.txHead = uart1_txByteQ;
-   uart1_obj.txTail = uart1_txByteQ;
-   uart1_obj.rxHead = uart1_rxByteQ;
-   uart1_obj.rxTail = uart1_rxByteQ;
-   uart1_obj.rxStatus.s.empty = true;
-   uart1_obj.txStatus.s.empty = true;
-   uart1_obj.txStatus.s.full = false;
-   uart1_obj.rxStatus.s.full = false;
+}
+
+void Com_MODBUS_Read(uint8_t Slave, uint8_t Function, uint16_t StartingAddress, uint16_t Quantity)
+{
+        INT_VAL auxStartingAddress, auxQuantity;
+        auxStartingAddress.Val = StartingAddress;
+        auxQuantity.Val=Quantity;
+        
+        buffTx[0]=Slave;
+        buffTx[1]=Function;
+        buffTx[2]=auxStartingAddress.byte.HB;
+        buffTx[3]=auxStartingAddress.byte.LB;
+        buffTx[4]=auxQuantity.byte.HB;
+        buffTx[5]=auxQuantity.byte.LB;
+        Crc.Val=CRC16(buffTx,6);
+		buffTx[6]=Crc.byte.LB;
+		buffTx[7]=Crc.byte.HB;
+        
+        contTx=8;
+		pint=buffTx;                
+		U2TXREG = *pint;
+}
+
+/*
+ * This function has the Write MODBUS functions
+ */
+
+
+void Com_MODBUS_Write(uint8_t Slave, uint8_t Function, uint16_t Address, uint16_t Data)
+{
+        INT_VAL auxAddress, auxData;
+        auxAddress.Val=Address;
+        auxData.Val=Data;
+    
+        buffTx[0]=Slave;
+        buffTx[1] = Function;
+        buffTx[2] = auxAddress.byte.HB;
+        buffTx[3] = auxAddress.byte.LB;
+        buffTx[4] = auxData.byte.HB;
+        buffTx[5] = auxData.byte.LB;
+        Crc.Val = CRC16(buffTx,6);
+		buffTx[6] = Crc.byte.LB;
+		buffTx[7] = Crc.byte.HB;
+        
+        contTx = 8;
+		pint = buffTx;
+        SlaveID = Slave;
+		U2TXREG = *pint;
+}
+
+void SLAVEADDRESS(void)
+{
+    if(auxRx == SlaveID){
+                n=0;
+                buffRx[n++]  = auxRx;
+                curr_state = Function;
+                LED=0;
+                //U2TXREG = auxRx; 
+            }
+    else {
+        curr_state =  EsperaSincronismo;
+       // U2TXREG = auxRx;
+    }    
+}
+
+void FUNCTION(void)
+{
+    buffRx[n++]  = auxRx;
+    switch(auxRx)
+            {  
+                case 1:
+                   curr_state = ByteCount;
+                break;
+                
+                case 2:
+                    curr_state = ByteCount;
+                break;
+                         
+                case 3:
+                    curr_state = ByteCount;
+                break;
+                
+                case 4:
+                    curr_state = ByteCount;
+                break;
+                
+                case 5:
+                    curr_state = CoilAddress5HI;
+                break;
+                
+                case 6:
+                    curr_state = RegisterAddress6HI;
+                break;
+                         
+                case 15:
+                    curr_state =  EsperaSincronismo;
+                break;
+                
+                case 16:
+                    curr_state =  EsperaSincronismo;
+                break; 
+                
+                default:
+                    curr_state =  EsperaSincronismo;
+                break;    
+            
+            }
+}
+
+void BYTECOUNT(void)
+{
+    buffRx[n++]  = auxRx;
+    curr_state =  Data;
+    j=1;
+}
+
+void DATA(void)
+{
+    buffRx[n++]  = auxRx;
+     if (j==buffRx[2])
+        curr_state=Crc1Hi;
+    j++;
+}
+
+
+
+void CRC1Hi(void)
+{
+buffRx[n++] = auxRx;
+curr_state=Crc1Lo;
+}
+
+void CRC1Lo(void)
+{
+	buffRx[n++]  = auxRx;
+	curr_state=  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0){
+		// datos buenos crear respuesta  
+		
+		LED = !LED; // LED0 cambia cada vez que pasa
+        
+
+        
+        for (j=1;j==buffRx[1];++j)
+        switch(buffRx[1])
+        {
+            case ReadCoils:
+            
+                CoilRegister[buffRx[0]][j].Val = buffRx[2+j];
+            break;
+            case ReadDiscreteInputs:
+                DiscreteInputRegister[buffRx[0]][j].Val=buffRx[2+j];
+            break;   
+            case ReadHoldingRegisters:
+                HoldingRegister[buffRx[0]][j].Val=buffRx[2+j];
+            break;
+            case ReadInputRegisters:
+                HoldingRegister[buffRx[0]][j].Val=buffRx[2+j];
+            break;
+        }
+}
+}   
+
+
+void COILADDRESS5HI(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.HB = auxRx;
+	curr_state = CoilAddress5LO;
+}
+
+void COILADDRESS5LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	dirIn.byte.LB = auxRx;
+    curr_state = ForceData5Hi;       
+}
+void  FORCEDATA5Hi(void)
+{
+	buffRx[n++]  = auxRx;
+	NoIn.byte.HB = auxRx;
+	curr_state = ForceData5Lo;
+}    
+
+void FORCEDATA5Lo(void){
+	
+	buffRx[n++]  = auxRx;
+	NoIn.byte.LB = auxRx;
+	curr_state =  Crc5Hi;
+}
+
+void CRC5Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	Crc.byte.HB = auxRx;
+	curr_state =  Crc5Lo;	
+}
+
+void CRC5Lo(void){
+	
+	buffRx[n++]  = auxRx;
+	Crc.byte.LB = auxRx;
+	curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0)
+	{
+		
+        WriteSuccess=true;
+       for (j=0;j==7;j++)
+           if (buffRx[j]!=buffTx[j])
+               WriteSuccess=false;
+        
+	}           
+}
+
+void REGISTERADDRESS6HI(void)
+{	
+	buffRx[n++]  = auxRx;
+	curr_state = RegisterAddress6LO;
+}
+
+void REGISTERADDRESS6LO(void)
+{	
+	buffRx[n++]  = auxRx;
+	curr_state = WriteData6Hi;       
+}        
+void  WRITEDATA6Hi(void)
+{
+	buffRx[n++]  = auxRx;
+	curr_state = WriteData6Lo;
+}
+
+void WRITEDATA6Lo(void)
+{  
+	buffRx[n++]  = auxRx;
+	curr_state =  Crc6Hi;
+}
+
+void CRC6Hi(void)
+{	
+	buffRx[n++]  = auxRx;
+	curr_state =  Crc6Lo;
+}
+
+void CRC6Lo(void)
+{	
+	buffRx[n++]  = auxRx;
+	curr_state =  EsperaSincronismo;
+	//CRC
+	if(CRC16 (buffRx, n)==0)
+	{
+        WriteSuccess=true;
+       for (j=0;j==7;j++)
+           if (buffRx[j]!=buffTx[j])
+               WriteSuccess=false;
+        
+	}           
+}
+
+void ESPERASINCRONISMO(void)
+{	// este estado no hace nada espera Timer 1 lo saque de aqui	
+}
+/*
+ *This functions starts the module of modbus by trying to comunicate with each 
+ * slave asking for its Holding registers 
+ */
+
+void Com_MODBUS_Init(void)
+{
+   
+
 }
 
 
@@ -171,293 +407,18 @@ void UART1_Initialize (void)
 /**
     Maintains the driver's transmitter state machine and implements its ISR
 */
-void UART1_SetTxInterruptHandler(void* handler){
-    UART1_TxDefaultInterruptHandler = handler;
-}
+
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
 {
-    (*UART1_TxDefaultInterruptHandler)();
+    IFS1bits.U1RXIF = false;
 }
 
-void UART1_Transmit_ISR(void)
-{ 
-    if(uart1_obj.txStatus.s.empty)
-    {
-        IEC0bits.U1TXIE = false;
-        return;
-    }
 
-    IFS0bits.U1TXIF = false;
 
-    while(!(U1STAbits.UTXBF == 1))
-    {
-
-        U1TXREG = *uart1_obj.txHead;
-
-        uart1_obj.txHead++;
-
-        if(uart1_obj.txHead == (uart1_txByteQ + UART1_CONFIG_TX_BYTEQ_LENGTH))
-        {
-            uart1_obj.txHead = uart1_txByteQ;
-        }
-
-        uart1_obj.txStatus.s.full = false;
-
-        if(uart1_obj.txHead == uart1_obj.txTail)
-        {
-            uart1_obj.txStatus.s.empty = true;
-            break;
-        }
-    }
-}
-
-void UART1_SetRxInterruptHandler(void* handler){
-    UART1_RxDefaultInterruptHandler = handler;
-}
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1RXInterrupt( void )
 {
-    (*UART1_RxDefaultInterruptHandler)();
+    IFS1bits.U1RXIF = false;
 }
 
-void UART1_Receive_ISR(void)
-{
-
-
-    while((U1STAbits.URXDA == 1))
-    {
-
-        *uart1_obj.rxTail = U1RXREG;
-
-        uart1_obj.rxTail++;
-
-        if(uart1_obj.rxTail == (uart1_rxByteQ + UART1_CONFIG_RX_BYTEQ_LENGTH))
-        {
-            uart1_obj.rxTail = uart1_rxByteQ;
-        }
-
-        uart1_obj.rxStatus.s.empty = false;
-        
-        if(uart1_obj.rxTail == uart1_obj.rxHead)
-        {
-            //Sets the flag RX full
-            uart1_obj.rxStatus.s.full = true;
-            break;
-        }
-        
-    }
-
-    IFS0bits.U1RXIF = false;
-   
-}
-
-
-void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1ErrInterrupt ( void )
-{
-    if ((U1STAbits.OERR == 1))
-    {
-        U1STAbits.OERR = 0;
-    }
-
-    IFS4bits.U1ERIF = false;
-}
-
-/**
-  Section: UART Driver Client Routines
-*/
-
-uint8_t UART1_Read( void)
-{
-    uint8_t data = 0;
-
-    data = *uart1_obj.rxHead;
-
-    uart1_obj.rxHead++;
-
-    if (uart1_obj.rxHead == (uart1_rxByteQ + UART1_CONFIG_RX_BYTEQ_LENGTH))
-    {
-        uart1_obj.rxHead = uart1_rxByteQ;
-    }
-
-    if (uart1_obj.rxHead == uart1_obj.rxTail)
-    {
-        uart1_obj.rxStatus.s.empty = true;
-    }
-
-    uart1_obj.rxStatus.s.full = false;
-
-    return data;
-}
-
-
-unsigned int UART1_ReadBuffer( uint8_t *buffer, unsigned int bufLen)
-{
-    unsigned int numBytesRead = 0 ;
-    while ( numBytesRead < ( bufLen ))
-    {
-        if( uart1_obj.rxStatus.s.empty)
-        {
-            break;
-        }
-        else
-        {
-            buffer[numBytesRead++] = UART1_Read () ;
-        }
-    }
-
-    return numBytesRead ;
-}
-
-
-
-void UART1_Write( uint8_t byte)
-{
-    IEC0bits.U1TXIE = false;
-    
-    *uart1_obj.txTail = byte;
-
-    uart1_obj.txTail++;
-    
-    if (uart1_obj.txTail == (uart1_txByteQ + UART1_CONFIG_TX_BYTEQ_LENGTH))
-    {
-        uart1_obj.txTail = uart1_txByteQ;
-    }
-
-    uart1_obj.txStatus.s.empty = false;
-
-    if (uart1_obj.txHead == uart1_obj.txTail)
-    {
-        uart1_obj.txStatus.s.full = true;
-    }
-
-    IEC0bits.U1TXIE = true ;
-	
-}
-
-
-unsigned int UART1_WriteBuffer( uint8_t *buffer , unsigned int bufLen )
-{
-    unsigned int numBytesWritten = 0 ;
-
-    while ( numBytesWritten < ( bufLen ))
-    {
-        if((uart1_obj.txStatus.s.full))
-        {
-            break;
-        }
-        else
-        {
-            UART1_Write (buffer[numBytesWritten++] ) ;
-        }
-    }
-
-    return numBytesWritten ;
-
-}
-
-
-UART1_TRANSFER_STATUS UART1_TransferStatusGet (void )
-{
-    UART1_TRANSFER_STATUS status = 0;
-
-    if(uart1_obj.txStatus.s.full)
-    {
-        status |= UART1_TRANSFER_STATUS_TX_FULL;
-    }
-
-    if(uart1_obj.txStatus.s.empty)
-    {
-        status |= UART1_TRANSFER_STATUS_TX_EMPTY;
-    }
-
-    if(uart1_obj.rxStatus.s.full)
-    {
-        status |= UART1_TRANSFER_STATUS_RX_FULL;
-    }
-
-    if(uart1_obj.rxStatus.s.empty)
-    {
-        status |= UART1_TRANSFER_STATUS_RX_EMPTY;
-    }
-    else
-    {
-        status |= UART1_TRANSFER_STATUS_RX_DATA_PRESENT;
-    }
-    return status;
-}
-
-
-uint8_t UART1_Peek(uint16_t offset)
-{
-    if( (uart1_obj.rxHead + offset) > (uart1_rxByteQ + UART1_CONFIG_RX_BYTEQ_LENGTH))
-    {
-      return uart1_rxByteQ[offset - (uart1_rxByteQ + UART1_CONFIG_RX_BYTEQ_LENGTH - uart1_obj.rxHead)];
-    }
-    else
-    {
-      return *(uart1_obj.rxHead + offset);
-    }
-}
-
-
-uint8_t UART1_is_rx_ready(void)
-{
-    if(!uart1_obj.rxStatus.s.full)
-    {
-        if(uart1_obj.rxHead > uart1_obj.rxTail)
-        {
-            return(uart1_obj.rxHead - uart1_obj.rxTail);
-        }
-        else
-        {
-            return(UART1_CONFIG_RX_BYTEQ_LENGTH - (uart1_obj.rxTail - uart1_obj.rxHead));
-        } 
-    }
-    return 0;
-}
-
-
-uint8_t UART1_is_tx_ready(void)
-{
-    if(!uart1_obj.txStatus.s.full)
-    { 
-        if(uart1_obj.txHead > uart1_obj.txTail)
-        {
-            return(uart1_obj.txHead - uart1_obj.txTail);
-        }
-        else
-        {
-            return(UART1_CONFIG_TX_BYTEQ_LENGTH - (uart1_obj.txTail - uart1_obj.txHead));
-        }
-    }
-    return 0;
-}
-
-
-bool UART1_ReceiveBufferIsEmpty (void)
-{
-    return(uart1_obj.rxStatus.s.empty);
-}
-
-
-bool UART1_TransmitBufferIsFull(void)
-{
-    return(uart1_obj.txStatus.s.full);
-}
-
-
-UART1_STATUS UART1_StatusGet (void)
-{
-    return U1STA;
-}
-
-bool UART1_is_tx_done(void)
-{
-    return U1STAbits.TRMT;
-}
-
-
-/**
-  End of File
-*/
