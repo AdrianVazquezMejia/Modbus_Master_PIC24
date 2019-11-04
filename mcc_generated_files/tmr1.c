@@ -49,11 +49,19 @@
 
 #include <stdio.h>
 #include "tmr1.h"
-#include "uart2.h"
 #include "pin_manager.h"
-
+#include "uart1.h"
+#include "uart2.h"
+#include "CRC.h"
 
 extern ModbusEstados curr_state; 
+
+extern INT_VAL InputRegister[10];
+extern INT_VAL HoldingRegister[10];
+extern uint8_t buffTx[100], contTx, *pint;
+
+
+
 /**
  Section: File specific functions
 */

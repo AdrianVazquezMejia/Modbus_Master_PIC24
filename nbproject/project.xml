@@ -12,9 +12,9 @@
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
-<<<<<<< Updated upstream
-=======
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>mcc_generated_files</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>default</name>
@@ -24,7 +24,6 @@
             <formatting>
                 <project-formatting-style>false</project-formatting-style>
             </formatting>
->>>>>>> Stashed changes
         </data>
     </configuration>
 </project>

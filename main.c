@@ -72,6 +72,7 @@ int main(void)
         for(t=0;t<500000;t++);
         Com_MODBUS_Write(RTU2,WriteCoil,OutValve,ON);
 		s++;
+        
 //        InputRegister[0].Val=s;
 //        InputRegister[1].Val=s+1;
 //        CoilRegister.bits.b0=1;

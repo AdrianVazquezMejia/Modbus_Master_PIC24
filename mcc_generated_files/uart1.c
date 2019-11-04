@@ -20,37 +20,13 @@
         MPLAB 	          :  MPLAB X 3.45
 */
 
-/*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
 
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
 
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
-
-/**
-  Section: Included Files
-*/
 /* Propose of this UART :
  * 
  * This UART is for the TPC/IP comunication, it is connected to se virtual serial port
  * 
  */
-
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -58,54 +34,52 @@
 #include "uart1.h"
 #include "CRC.h"
 #include "pin_manager.h"
+#include"uart2.h"
 /**
   Section: Data Type Definitions
 */
 
-/** UART Driver Queue Status
-
-  @Summary
-    Defines the object required for the status of the queue.
-*/
 
 
+INT_VAL dirIn1;
+INT_VAL NoIn1;
+INT_VAL Crc1;
+INT_VAL InputRegister1[10][6];
+INT_VAL OwnInputRegisters1[10][6];
+INT_VAL HoldingRegister1[10][6];
+INT_VAL CoilRegister1[10][6];
+INT_VAL DiscreteInputRegister1[10][6];
+uint8_t j1=1;
+uint8_t SlaveID1 = 0;
+bool WriteSuccess1;
 
-UART_BYTEQ_STATUS;
-
-/** UART Driver Hardware Instance Object
-
-  @Summary
-    Defines the object required for the maintenance of the hardware instance.
-
-*/
+void (*state_table1[120])(void)={SLAVEADDRESS,FUNCTION,BYTECOUNT, DATA,
+    CRC1Hi, CRC1Lo,COILADDRESS5HI, COILADDRESS5LO, FORCEDATA5Hi,
+    FORCEDATA5Lo, CRC5Hi, CRC5Lo,REGISTERADDRESS6HI, REGISTERADDRESS6LO,
+    WRITEDATA6Hi, WRITEDATA6Lo, CRC6Hi, CRC6Lo,ESPERASINCRONISMO};
 
 
-/** UART Driver Queue Length
 
-  @Summary
-    Defines the length of the Transmit and Receive Buffers
 
-*/
+static uint8_t * volatile rxTail1;
+//static uint8_t *rxHead;
+//static uint8_t *txTail;
+static uint8_t * volatile txHead1;
+static bool volatile rxOverflowed1;
+uint8_t *pint1;
+uint8_t contTx1;
+ModbusEstados curr_state1=SlaveAddress;
+uint8_t buffRx1[100], buffTx1[100],n1,auxRx1;
+
 
 #define UART1_CONFIG_TX_BYTEQ_LENGTH 8
 #define UART1_CONFIG_RX_BYTEQ_LENGTH 8
 
 
-/** UART Driver Queue
 
-  @Summary
-    Defines the Transmit and Receive Buffers
+//static uint8_t uart1_txByteQ[UART1_CONFIG_TX_BYTEQ_LENGTH] ;
+//static uint8_t uart1_rxByteQ[UART1_CONFIG_RX_BYTEQ_LENGTH] ;
 
-*/
-
-static uint8_t uart1_txByteQ[UART1_CONFIG_TX_BYTEQ_LENGTH] ;
-static uint8_t uart1_rxByteQ[UART1_CONFIG_RX_BYTEQ_LENGTH] ;
-
-
-
-/**
-  Section: Driver Interface
-*/
 
 
 void UART1_Initialize (void)
@@ -118,8 +92,7 @@ void UART1_Initialize (void)
    U1BRG = 0x01A0;
     
    IEC0bits.U1RXIE = 1;
-   UART1_SetRxInterruptHandler(UART1_Receive_ISR);
-   UART1_SetTxInterruptHandler(UART1_Transmit_ISR);
+
 
     //Make sure to set LAT bit corresponding to TxPin as high before UART initialization
    U1MODEbits.UARTEN = 1;  // enabling UART ON bit
@@ -129,25 +102,24 @@ void UART1_Initialize (void)
 
 }
 
-void Com_MODBUS_Read(uint8_t Slave, uint8_t Function, uint16_t StartingAddress, uint16_t Quantity)
+void Com_MODBUS_Read1(uint8_t Slave, uint8_t Function, uint16_t StartingAddress, uint16_t Quantity)
 {
-        INT_VAL auxStartingAddress, auxQuantity;
-        auxStartingAddress.Val = StartingAddress;
-        auxQuantity.Val=Quantity;
+        INT_VAL auxStartingAddress1, auxQuantity1;
+        auxStartingAddress1.Val = StartingAddress;
+        auxQuantity1.Val=Quantity;
         
-        buffTx[0]=Slave;
-        buffTx[1]=Function;
-        buffTx[2]=auxStartingAddress.byte.HB;
-        buffTx[3]=auxStartingAddress.byte.LB;
-        buffTx[4]=auxQuantity.byte.HB;
-        buffTx[5]=auxQuantity.byte.LB;
-        Crc.Val=CRC16(buffTx,6);
-		buffTx[6]=Crc.byte.LB;
-		buffTx[7]=Crc.byte.HB;
-        
-        contTx=8;
-		pint=buffTx;                
-		U2TXREG = *pint;
+        buffTx1[0]=Slave;
+        buffTx1[1]=Function;
+        buffTx1[2]=auxStartingAddress1.byte.HB;
+        buffTx1[3]=auxStartingAddress1.byte.LB;
+        buffTx1[4]=auxQuantity1.byte.HB;
+        buffTx1[5]=auxQuantity1.byte.LB;
+        Crc1.Val=CRC16(buffTx1,6);
+		buffTx1[6]=Crc1.byte.LB;
+		buffTx1[7]=Crc1.byte.HB;
+        contTx1=8;
+		pint1=buffTx1;                
+		U1TXREG = *pint1;
 }
 
 /*
@@ -155,247 +127,247 @@ void Com_MODBUS_Read(uint8_t Slave, uint8_t Function, uint16_t StartingAddress, 
  */
 
 
-void Com_MODBUS_Write(uint8_t Slave, uint8_t Function, uint16_t Address, uint16_t Data)
+void Com_MODBUS_Write1(uint8_t Slave, uint8_t Function, uint16_t Address, uint16_t Data)
 {
-        INT_VAL auxAddress, auxData;
-        auxAddress.Val=Address;
-        auxData.Val=Data;
+        INT_VAL auxAddress1, auxData1;
+        auxAddress1.Val=Address;
+        auxData1.Val=Data;
     
-        buffTx[0]=Slave;
-        buffTx[1] = Function;
-        buffTx[2] = auxAddress.byte.HB;
-        buffTx[3] = auxAddress.byte.LB;
-        buffTx[4] = auxData.byte.HB;
-        buffTx[5] = auxData.byte.LB;
-        Crc.Val = CRC16(buffTx,6);
-		buffTx[6] = Crc.byte.LB;
-		buffTx[7] = Crc.byte.HB;
+        buffTx1[0]=Slave;
+        buffTx1[1] = Function;
+        buffTx1[2] = auxAddress1.byte.HB;
+        buffTx1[3] = auxAddress1.byte.LB;
+        buffTx1[4] = auxData1.byte.HB;
+        buffTx1[5] = auxData1.byte.LB;
+        Crc1.Val = CRC16(buffTx1,6);
+		buffTx1[6] = Crc1.byte.LB;
+		buffTx1[7] = Crc1.byte.HB;
         
-        contTx = 8;
-		pint = buffTx;
-        SlaveID = Slave;
-		U2TXREG = *pint;
+        contTx1 = 8;
+		pint1 = buffTx1;
+        SlaveID1 = Slave;
+		U1TXREG = *pint1;
 }
 
-void SLAVEADDRESS(void)
+void SLAVEADDRESS1(void)
 {
-    if(auxRx == SlaveID){
-                n=0;
-                buffRx[n++]  = auxRx;
-                curr_state = Function;
+    if(auxRx1 == SlaveID1){
+                n1=0;
+                buffRx1[n1++]  = auxRx1;
+                curr_state1 = Function;
                 LED=0;
-                //U2TXREG = auxRx; 
+                //U1TXREG = auxRx; 
             }
     else {
-        curr_state =  EsperaSincronismo;
-       // U2TXREG = auxRx;
+        curr_state1 =  EsperaSincronismo;
+       // U1TXREG = auxRx;
     }    
 }
 
-void FUNCTION(void)
+void FUNCTION1(void)
 {
-    buffRx[n++]  = auxRx;
-    switch(auxRx)
+    buffRx1[n1++]  = auxRx1;
+    switch(auxRx1)
             {  
                 case 1:
-                   curr_state = ByteCount;
+                   curr_state1 = ByteCount;
                 break;
                 
                 case 2:
-                    curr_state = ByteCount;
+                    curr_state1 = ByteCount;
                 break;
                          
                 case 3:
-                    curr_state = ByteCount;
+                    curr_state1 = ByteCount;
                 break;
                 
                 case 4:
-                    curr_state = ByteCount;
+                    curr_state1 = ByteCount;
                 break;
                 
                 case 5:
-                    curr_state = CoilAddress5HI;
+                    curr_state1 = CoilAddress5HI;
                 break;
                 
                 case 6:
-                    curr_state = RegisterAddress6HI;
+                    curr_state1 = RegisterAddress6HI;
                 break;
                          
                 case 15:
-                    curr_state =  EsperaSincronismo;
+                    curr_state1 =  EsperaSincronismo;
                 break;
                 
                 case 16:
-                    curr_state =  EsperaSincronismo;
+                    curr_state1 =  EsperaSincronismo;
                 break; 
                 
                 default:
-                    curr_state =  EsperaSincronismo;
+                    curr_state1 =  EsperaSincronismo;
                 break;    
             
             }
 }
 
-void BYTECOUNT(void)
+void BYTECOUNT1(void)
 {
-    buffRx[n++]  = auxRx;
-    curr_state =  Data;
-    j=1;
+    buffRx1[n1++]  = auxRx1;
+    curr_state1 =  Data;
+    j1=1;
 }
 
-void DATA(void)
+void DATA1(void)
 {
-    buffRx[n++]  = auxRx;
-     if (j==buffRx[2])
-        curr_state=Crc1Hi;
-    j++;
+    buffRx1[n1++]  = auxRx1;
+     if (j1==buffRx1[2])
+        curr_state1=Crc1Hi;
+    j1++;
 }
 
 
 
-void CRC1Hi(void)
+void CRC1Hi1(void)
 {
-buffRx[n++] = auxRx;
-curr_state=Crc1Lo;
+buffRx1[n1++] = auxRx1;
+curr_state1=Crc1Lo;
 }
 
-void CRC1Lo(void)
+void CRC1Lo1(void)
 {
-	buffRx[n++]  = auxRx;
-	curr_state=  EsperaSincronismo;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 =  EsperaSincronismo;
 	//CRC
-	if(CRC16 (buffRx, n)==0){
+	if(CRC16 (buffRx1, n1)==0){
 		// datos buenos crear respuesta  
 		
 		LED = !LED; // LED0 cambia cada vez que pasa
         
 
         
-        for (j=1;j==buffRx[1];++j)
-        switch(buffRx[1])
+        for (j1=1;j1==buffRx1[1];++j1)
+        switch(buffRx1[1])
         {
             case ReadCoils:
             
-                CoilRegister[buffRx[0]][j].Val = buffRx[2+j];
+                CoilRegister1[buffRx1[0]][j1].Val = buffRx1[2+j1];
             break;
             case ReadDiscreteInputs:
-                DiscreteInputRegister[buffRx[0]][j].Val=buffRx[2+j];
+                DiscreteInputRegister1[buffRx1[0]][j1].Val=buffRx1[2+j1];
             break;   
             case ReadHoldingRegisters:
-                HoldingRegister[buffRx[0]][j].Val=buffRx[2+j];
+                HoldingRegister1[buffRx1[0]][j1].Val=buffRx1[2+j1];
             break;
             case ReadInputRegisters:
-                HoldingRegister[buffRx[0]][j].Val=buffRx[2+j];
+                HoldingRegister1[buffRx1[0]][j1].Val=buffRx1[2+j1];
             break;
         }
 }
 }   
 
 
-void COILADDRESS5HI(void)
+void COILADDRESS5HI1(void)
 {	
-	buffRx[n++]  = auxRx;
-	dirIn.byte.HB = auxRx;
-	curr_state = CoilAddress5LO;
+	buffRx1[n1++]  = auxRx1;
+	dirIn1.byte.HB = auxRx1;
+	curr_state1 = CoilAddress5LO;
 }
 
-void COILADDRESS5LO(void)
+void COILADDRESS5LO1(void)
 {	
-	buffRx[n++]  = auxRx;
-	dirIn.byte.LB = auxRx;
-    curr_state = ForceData5Hi;       
+	buffRx1[n1++]  = auxRx1;
+	dirIn1.byte.LB = auxRx1;
+    curr_state1 = ForceData5Hi;       
 }
-void  FORCEDATA5Hi(void)
+void  FORCEDATA5Hi1(void)
 {
-	buffRx[n++]  = auxRx;
-	NoIn.byte.HB = auxRx;
-	curr_state = ForceData5Lo;
+	buffRx1[n1++]  = auxRx1;
+	NoIn1.byte.HB = auxRx1;
+	curr_state1 = ForceData5Lo;
 }    
 
-void FORCEDATA5Lo(void){
+void FORCEDATA5Lo1(void){
 	
-	buffRx[n++]  = auxRx;
-	NoIn.byte.LB = auxRx;
-	curr_state =  Crc5Hi;
+	buffRx1[n1++]  = auxRx1;
+	NoIn1.byte.LB = auxRx1;
+	curr_state1 =  Crc5Hi;
 }
 
-void CRC5Hi(void)
+void CRC5Hi1(void)
 {	
-	buffRx[n++]  = auxRx;
-	Crc.byte.HB = auxRx;
-	curr_state =  Crc5Lo;	
+	buffRx1[n1++]  = auxRx1;
+	Crc1.byte.HB = auxRx1;
+	curr_state1 =  Crc5Lo;	
 }
 
-void CRC5Lo(void){
+void CRC5Lo1(void){
 	
-	buffRx[n++]  = auxRx;
-	Crc.byte.LB = auxRx;
-	curr_state =  EsperaSincronismo;
+	buffRx1[n1++]  = auxRx1;
+	Crc1.byte.LB = auxRx1;
+	curr_state1 =  EsperaSincronismo;
 	//CRC
-	if(CRC16 (buffRx, n)==0)
+	if(CRC16 (buffRx1, n1)==0)
 	{
 		
-        WriteSuccess=true;
-       for (j=0;j==7;j++)
-           if (buffRx[j]!=buffTx[j])
-               WriteSuccess=false;
+        WriteSuccess1=true;
+       for (j1=0;j1==7;j1++)
+           if (buffRx1[j1]!=buffTx1[j1])
+               WriteSuccess1=false;
         
 	}           
 }
 
-void REGISTERADDRESS6HI(void)
+void REGISTERADDRESS6HI1(void)
 {	
-	buffRx[n++]  = auxRx;
-	curr_state = RegisterAddress6LO;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 = RegisterAddress6LO;
 }
 
-void REGISTERADDRESS6LO(void)
+void REGISTERADDRESS6LO1(void)
 {	
-	buffRx[n++]  = auxRx;
-	curr_state = WriteData6Hi;       
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 = WriteData6Hi;       
 }        
-void  WRITEDATA6Hi(void)
+void  WRITEDATA6Hi1(void)
 {
-	buffRx[n++]  = auxRx;
-	curr_state = WriteData6Lo;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 = WriteData6Lo;
 }
 
-void WRITEDATA6Lo(void)
+void WRITEDATA6Lo1(void)
 {  
-	buffRx[n++]  = auxRx;
-	curr_state =  Crc6Hi;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 =  Crc6Hi;
 }
 
-void CRC6Hi(void)
+void CRC6Hi1(void)
 {	
-	buffRx[n++]  = auxRx;
-	curr_state =  Crc6Lo;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 =  Crc6Lo;
 }
 
-void CRC6Lo(void)
+void CRC6Lo1(void)
 {	
-	buffRx[n++]  = auxRx;
-	curr_state =  EsperaSincronismo;
+	buffRx1[n1++]  = auxRx1;
+	curr_state1 =  EsperaSincronismo;
 	//CRC
-	if(CRC16 (buffRx, n)==0)
+	if(CRC16 (buffRx1, n1)==0)
 	{
-        WriteSuccess=true;
-       for (j=0;j==7;j++)
-           if (buffRx[j]!=buffTx[j])
-               WriteSuccess=false;
+        WriteSuccess1=true;
+       for (j1=0;j1==7;j1++)
+           if (buffRx1[j1]!=buffTx1[j1])
+               WriteSuccess1=false;
         
 	}           
 }
 
-void ESPERASINCRONISMO(void)
-{	// este estado no hace nada espera Timer 1 lo saque de aqui	
+void ESPERASINCRONISMO1(void)
+{	// este estado no hace nada espera Timer 2 lo saque de aqui	
 }
 /*
  *This functions starts the module of modbus by trying to comunicate with each 
  * slave asking for its Holding registers 
  */
 
-void Com_MODBUS_Init(void)
+void Com_MODBUS_Init1(void)
 {
    
 
@@ -411,7 +383,12 @@ void Com_MODBUS_Init(void)
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
 {
-    IFS1bits.U1RXIF = false;
+    
+    PORTAbits.RA1=!PORTAbits.RA1;
+    pint1++;
+    if(--contTx1>0) U1TXREG = *pint1; 
+    IFS0bits.U1TXIF = false;
+    
 }
 
 
@@ -419,6 +396,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1TXInterrupt ( void )
 
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1RXInterrupt( void )
 {
-    IFS1bits.U1RXIF = false;
+    TMR2 = 0x00;
+    auxRx1 = U1RXREG;
+    LED = 1;
+    state_table1[curr_state1]();
+    IFS0bits.U1RXIF = false;
 }
 
