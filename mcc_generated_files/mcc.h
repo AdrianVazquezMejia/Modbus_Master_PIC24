@@ -55,7 +55,10 @@
 #include "tmr1.h"
 #include "interrupt_manager.h"
 #include "traps.h"
+#include "ext_int.h"
 #include "uart2.h"
+#include "uart1.h"
+#include "tmr2.h"
 
 #ifndef _XTAL_FREQ
 #define _XTAL_FREQ  32000000UL

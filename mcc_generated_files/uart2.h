@@ -76,6 +76,35 @@ typedef union
 
 } INT_VAL;
 
+typedef union
+{
+    uint16_t boma;
+    WORD_BITS bits;
+    struct
+    {
+        uint8_t LB;
+        uint8_t HB;
+    }byte;
+}BOMBAS;
+
+typedef union
+{
+    uint16_t tanque;
+    WORD_BITS bits;
+    struct
+    {
+        uint8_t LB;
+        uint8_t HB;
+    }byte;
+}TANQUES;
+
+
+typedef enum{
+    escribir = 1, leer
+}situacion;
+
+
+
 void UART2_Initialize(void);
 void SLAVEADDRESS(void);
 void FUNCTION(void);
