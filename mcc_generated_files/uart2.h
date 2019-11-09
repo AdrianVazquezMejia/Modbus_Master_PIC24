@@ -78,7 +78,7 @@ typedef union
 
 typedef union
 {
-    uint16_t boma;
+    uint16_t bomba;
     WORD_BITS bits;
     struct
     {
