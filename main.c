@@ -50,7 +50,7 @@
 #include "mcc_generated_files/CRC.h"
 #include "mcc_generated_files/pin_manager.h"
 /*
-
+//
                          Main application
  */
 extern INT_VAL InputRegister[10];
@@ -68,17 +68,22 @@ int main(void)
     HoldingRegister[1].Val=10;
     while (1)
     {
-        Com_MODBUS_Read(RTU1, ReadCoils, InValve, 1);
-        for(t=0;t<500000;t++);
-        Com_MODBUS_Write(RTU2,WriteCoil,OutValve,ON);
-		s++;
+//        Com_MODBUS_Read(RTU1, ReadCoils, InValve, 1);
+        
+//        Com_MODBUS_Write(RTU1,WriteCoil,0,ON);
+//        for(t=0;t<5000000;t++);
+//        Com_MODBUS_Write(RTU2,WriteCoil,1,ON);
+//        for(t=0;t<5000000;t++);
+//        
+        
+//		s++;
         
 //        InputRegister[0].Val=s;
 //        InputRegister[1].Val=s+1;
 //        CoilRegister.bits.b0=1;
 //        CoilRegister.bits.b2=1;
 //        DiscreteInputRegister.byte.LB=0x0A;
-        for(t=0;t<500000;t++);  
+//        for(t=0;t<500000;t++);  
        //LED1=!LED1;
     }
 
