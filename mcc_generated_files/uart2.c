@@ -15,7 +15,9 @@ INT_VAL InputRegister[10][6];
 INT_VAL OwnInputRegisters[10][6];
 INT_VAL HoldingRegister[10][6];
 INT_VAL CoilRegister[10][6];
-INT_VAL DiscreteInputRegister[10][6];
+INT_VAL DInputRegister[10][6];
+INT_VAL Tanque[7];
+INT_VAL Bomba;
 uint8_t j=1;
 uint8_t SlaveID = 0;
 bool WriteSuccess;
@@ -256,7 +258,7 @@ void CRC1Lo(void)
                 CoilRegister[buffRx[0]][j].Val = buffRx[2+j];
             break;
             case ReadDiscreteInputs:
-                DiscreteInputRegister[buffRx[0]][j].Val=buffRx[2+j];
+                DInputRegister[buffRx[0]][j].Val=buffRx[2+j];
             break;   
             case ReadHoldingRegisters:
                 HoldingRegister[buffRx[0]][j].Val=buffRx[2+j];
@@ -411,7 +413,10 @@ void Com_MODBUS_Write(uint8_t Slave, uint8_t Function, uint16_t Address, uint16_
         INT_VAL auxAddress, auxData;
         auxAddress.Val=Address;
         auxData.Val=Data;
-    
+        if ((Function == WriteCoil) & (Data == 1))
+            auxData.Val=ON;
+        if ((Function == WriteCoil) & (Data == 0))
+            auxData.Val=OFF;
         buffTx[0]=Slave;
         buffTx[1] = Function;
         buffTx[2] = auxAddress.byte.HB;

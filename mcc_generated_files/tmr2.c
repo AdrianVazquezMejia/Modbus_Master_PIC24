@@ -55,13 +55,16 @@
 
 extern ModbusEstados curr_state; 
 int ss = 1;
-int i = 1;
+static int i = 1;
+static int j = 0;
+int k = 0;
 int cont = 1;
-BOMBAS bombas;
+extern INT_VAL Bomba;
 TANQUES tanques;
-extern INT_VAL InputRegister[10];
-extern INT_VAL HoldingRegister[10];
+extern INT_VAL DicreteInputRegister[10][6];
+extern INT_VAL HoldingRegister[10][6];
 extern uint8_t buffTx[100], contTx, *pint;
+extern INT_VAL Tanque[7];
 
 /**
  Section: File specific functions
@@ -141,71 +144,95 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
     //***User Area Begin
     switch(ss){
         case  escribir:
-            if (cont == 5){ss++;} // voy ahora a leer 
+            if (cont == 5){
+                ss++;
+                cont=1;
+            } // voy ahora a leer 
+            
                 switch(cont){
             case RTU1:
-                Com_MODBUS_Write(RTU1,WriteCoil,tanques.tanque = 0b0000000000000001,1);
+                Com_MODBUS_Write(RTU1,WriteCoil,1,Bomba.bits.b1);
                 cont++;
                 break;
 
             case RTU2:
                 switch(i){
                     case 1:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 2:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 3:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 4:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 5:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 6:
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i++;
                         break;
                     case 7:                     
-                        Com_MODBUS_Write(RTU2,WriteRegister,i,mimico[i]);
+                        Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i = 1;
                         break;
                     default:
                         break;
                          
-                };
+                }
                 
                 cont++;
                 break;
 
             case RTU3: 
-                Com_MODBUS_Write(RTU3,WriteCoil,tanques.tanque = 0b0000000000000110,1);
+                switch(j){
+                    case 0:
+                        Com_MODBUS_Write(RTU3,WriteCoil,6,Bomba.bits.b2);
+                        j++;
+                        break;
+                    case 1:
+                        Com_MODBUS_Write(RTU2,WriteCoil,6,Bomba.bits.b3);
+                        j=0;
+                        break;
+                }
                 cont++;
                 break;
-
             case RTU4:
-                Com_MODBUS_Write(RTU4,WriteCoil,bombas.bomba = 0b0000000000110100,1);
-                Com_MODBUS_Write(RTU4,WriteCoil,tanques.tanque = 0b0000000000000010,1);
+                switch(k){
+                    case 0:
+                        Com_MODBUS_Write(RTU3,WriteCoil,6,Bomba.bits.b4);
+                        k++;
+                        break;
+                    case 1:
+                        Com_MODBUS_Write(RTU2,WriteCoil,6,Bomba.bits.b5);
+                        k++;
+                        break;
+                    case 2:
+                        Com_MODBUS_Write(RTU2,WriteCoil,6,Bomba.bits.b6);
+                        k=0;
+                        break;
+                }
                 cont++;
                 break;
-
+                        
             case RTU5:
-                Com_MODBUS_Write(RTU5,WriteCoil,bombas.bomba = 0b0000000001000000,1);
+                Com_MODBUS_Write(RTU5,WriteCoil,6,Bomba.bits.b7);
                 cont++;
                 break;
 
             default:
                 break;
              
-        };
+        }
         
         break;
  
@@ -213,7 +240,16 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
             if (cont == 9){ss--;} // voy ahora a escribir
                 switch(cont){
             case RTU1:
-                Com_MODBUS_Read(RTU1,ReadInputRegisters,tanques.tanque = 0b0000000000000001,1);
+                switch(k){
+                    case 0: 
+                       Com_MODBUS_Read(RTU1,ReadInputRegisters,0,1);
+                       k++;
+                       break;
+                    case 1: 
+                        Com_MODBUS_Read(RTU1,ReadInputRegisters,1,1);
+                        k=0;
+                        break;
+                }
                 cont++;
                 break;
 
@@ -223,38 +259,46 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                 break;
 
             case RTU3: 
-                Com_MODBUS_Read(RTU3,ReadInputRegisters,tanques.tanque = 0b0000000000000110,1);
+                Com_MODBUS_Read(RTU3,ReadInputRegisters,1,1);
                 cont++;
                 break;
 
             case RTU4:
-                Com_MODBUS_Read(RTU4,ReadInputRegisters,bombas.bomba = 0b0000000000110100,1);
-                Com_MODBUS_Read(RTU4,ReadInputRegisters,tanques.tanque = 0b0000000000000010,1);
+                switch(j){
+                    case 0:
+                        Com_MODBUS_Read(RTU4,ReadInputRegisters,1,1);
+                        j++;
+                        break;
+                    case 1:
+                        Com_MODBUS_Read(RTU4,ReadInputRegisters,0,1);
+                        j=0;
+                        break;
+                         }
                 cont++;
                 break;
 
             case RTU5:
-                Com_MODBUS_Read(RTU5,ReadInputRegisters,bombas.bomba = 0b0000000001000000,1);
+                Com_MODBUS_Read(RTU5,ReadInputRegisters,0,1);
                 cont++;
                 break;
 
             case RTU6:
-                Com_MODBUS_Read(RTU6,ReadInputRegisters,tanques.tanque = 0b0000000000000100,1);
+                Com_MODBUS_Read(RTU6,ReadInputRegisters,0,1);
                 cont++;
                 break;
 
             case RTU7:
-                Com_MODBUS_Read(RTU7,ReadInputRegisters,bombas.bomba = 0b0000000000001000,1);
+                Com_MODBUS_Read(RTU7,ReadInputRegisters,0,1);
                 cont++;
                 break;
 
             case RTU8:
-                Com_MODBUS_Read(RTU8,ReadInputRegisters,bombas.bomba = 0b0000000000010000,1);
+                Com_MODBUS_Read(RTU8,ReadInputRegisters,0,1);
                 cont++;
                 break;
 
             case RTU9:
-                Com_MODBUS_Read(RTU9,ReadInputRegisters,bombas.bomba = 0b0000000001000000,1);
+                Com_MODBUS_Read(RTU9,ReadInputRegisters,0,1);
                 cont = 1;
                 break;
 
