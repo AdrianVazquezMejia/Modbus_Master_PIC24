@@ -112,7 +112,7 @@ void TMR2_Initialize (void)
     //Period = 0.05 s; Frequency = 16000000 Hz; PR2 12499; 
     PR2 = 0x30D3;
     //TCKPS 1:64; T32 16 Bit; TON enabled; TSIDL disabled; TCS FOSC/2; TGATE enabled; 
-    T2CON = 0x8060;
+    T2CON = 0x8020;
     
     if(TMR2_InterruptHandler == NULL)
     {
@@ -144,7 +144,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
     //***User Area Begin
     switch(ss){
         case  escribir:
-            if (cont == 5){
+            if (cont > 5){
                 ss++;
                 cont=1;
             } // voy ahora a leer 
@@ -184,13 +184,14 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                     case 7:                     
                         Com_MODBUS_Write(RTU2,WriteRegister,i,Tanque[i].Val);
                         i = 1;
+                        cont++;
                         break;
                     default:
                         break;
                          
                 }
                 
-                cont++;
+                
                 break;
 
             case RTU3: 
@@ -202,9 +203,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                     case 1:
                         Com_MODBUS_Write(RTU2,WriteCoil,6,Bomba.bits.b3);
                         j=0;
+                        cont++;
                         break;
                 }
-                cont++;
+                
                 break;
             case RTU4:
                 switch(k){
@@ -219,9 +221,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                     case 2:
                         Com_MODBUS_Write(RTU2,WriteCoil,6,Bomba.bits.b6);
                         k=0;
+                        cont++;
                         break;
                 }
-                cont++;
+                
                 break;
                         
             case RTU5:
@@ -237,7 +240,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
         break;
  
         case  leer:
-            if (cont == 9){ss--;} // voy ahora a escribir
+            if (cont > 9){ss--; cont = 1;} // voy ahora a escribir
                 switch(cont){
             case RTU1:
                 switch(k){
@@ -248,9 +251,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                     case 1: 
                         Com_MODBUS_Read(RTU1,ReadInputRegisters,1,1);
                         k=0;
+                        cont++;
                         break;
                 }
-                cont++;
+                
                 break;
 
             case RTU2:
@@ -272,9 +276,10 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
                     case 1:
                         Com_MODBUS_Read(RTU4,ReadInputRegisters,0,1);
                         j=0;
+                        cont++;
                         break;
                          }
-                cont++;
+                
                 break;
 
             case RTU5:
@@ -299,7 +304,7 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
 
             case RTU9:
                 Com_MODBUS_Read(RTU9,ReadInputRegisters,0,1);
-                cont = 1;
+                cont++;
                 break;
 
             default:
@@ -313,6 +318,8 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T2Interrupt (  )
             break;
            
     }
+    
+    
 
     // ticker function call;
     // ticker is 1 -> Callback function gets called everytime this ISR executes
