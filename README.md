@@ -17,11 +17,11 @@ There is a total of 12 Slaves, not all equals. Particulary, the 2nd is used as a
 	**main.c**	has the main tank's logic. 
 	Futher macros and declarations have been made in **uart2.h**
 	
-	
-	
 ## Further notes
 
 Please collaborate with useful code, we are happy to view your commets and take it as a valuable thing.
+
+Use MPLAB 4.0
 
 Keep coding, keep learning, keep growing up!
 
