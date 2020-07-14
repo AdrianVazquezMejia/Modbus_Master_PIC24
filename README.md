@@ -1,7 +1,7 @@
-# Modbus_Master_PIC24
+# Modbus Master PIC24
 A PIC24 module working as a master in a network of RTU in a system of water distribution
 
-Most information are in Mcc generated files: TIMER2 and UART2. And also in main.c
+Mostly the information are in Mcc generated files: TIMER2 and UART2. And also in main.c
 
 This project is managed by interruptions in the paripherals mentioned before and using state machines for logic: like sending and receiving data using MODBUS.
 
